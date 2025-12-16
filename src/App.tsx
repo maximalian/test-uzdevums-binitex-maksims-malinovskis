@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import "./App.css";
 import CountrySearch from "./components/FiltersBar/CountrySearch";
+import CovidTable from "./components/CovidTable/CovidTable";
 import DateRangeFilter from "./components/FiltersBar/DateRangeFilter";
 import FieldRangeFilter from "./components/FiltersBar/FieldRangeFilter";
 import ResetButton from "./components/FiltersBar/ResetButton";
 import ViewTabs from "./components/ViewTabs/ViewTabs";
 import type { CovidRecord } from "./types/covid";
+import type { CountryRow } from "./types/stats";
 import { fetchCovidData } from "./services/covidApi";
 import { aggregateByCountry } from "./utils/aggregate";
 import { getMinMaxDates } from "./utils/date";
@@ -33,11 +35,17 @@ function App() {
   const [maxValue, setMaxValue] = useState("");
   // Stage 2 debug: track loaded row count to ensure data pipeline still works
   const [rowCount, setRowCount] = useState<number | null>(null);
+  // Aggregated data and fetch status for table rendering
+  const [aggregatedData, setAggregatedData] = useState<CountryRow[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Load data once to keep aggregation pipeline validated; will be connected to filters later
   useEffect(() => {
     const loadAndAggregate = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const data = await fetchCovidData();
         const records: CovidRecord[] = data.records ?? [];
         if (!records.length) {
@@ -62,8 +70,13 @@ function App() {
         console.log("Aggregated preview:", aggregated.slice(0, 3));
 
         setRowCount(records.length);
+        setAggregatedData(aggregated);
       } catch (err) {
         console.error("Aggregation failed:", err);
+        setAggregatedData([]);
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -72,14 +85,11 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleChangeView = useCallback(
-    (next: ViewValue) => {
-      // DEBUG remove later: log view changes
-      console.log("App view changed:", next);
-      setView(next);
-    },
-    []
-  );
+  const handleChangeView = useCallback((next: ViewValue) => {
+    // DEBUG remove later: log view changes
+    console.log("App view changed:", next);
+    setView(next);
+  }, []);
 
   const handleChangeFrom = useCallback((next: Date) => {
     // DEBUG remove later: log date changes
@@ -155,25 +165,36 @@ function App() {
       <ViewTabs value={view} onChange={handleChangeView} />
 
       {view === "table" ? (
-        // Table view filters: country search + numeric range + reset
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "12px",
-            alignItems: "flex-end",
-          }}
-        >
-          <CountrySearch value={countryQuery} onChange={handleCountryChange} />
-          <FieldRangeFilter
-            field={field}
-            minValue={minValue}
-            maxValue={maxValue}
-            onChangeField={handleFieldChange}
-            onChangeMin={handleMinValueChange}
-            onChangeMax={handleMaxValueChange}
-          />
-          <ResetButton onReset={handleReset} />
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {/* Table view filters: country search + numeric range + reset */}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "12px",
+              alignItems: "flex-end",
+            }}
+          >
+            <CountrySearch value={countryQuery} onChange={handleCountryChange} />
+            <FieldRangeFilter
+              field={field}
+              minValue={minValue}
+              maxValue={maxValue}
+              onChangeField={handleFieldChange}
+              onChangeMin={handleMinValueChange}
+              onChangeMax={handleMaxValueChange}
+            />
+            <ResetButton onReset={handleReset} />
+          </div>
+
+          {/* Data table UI: show loading/error states, otherwise render the CovidTable with aggregated data */}
+          {loading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <p>Error: {error}</p>
+          ) : (
+            <CovidTable data={aggregatedData} />
+          )}
         </div>
       ) : (
         // Chart view placeholder to be replaced with real chart component
