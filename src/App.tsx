@@ -6,11 +6,14 @@ import DateRangeFilter from "./components/FiltersBar/DateRangeFilter";
 import FieldRangeFilter from "./components/FiltersBar/FieldRangeFilter";
 import ResetButton from "./components/FiltersBar/ResetButton";
 import ViewTabs from "./components/ViewTabs/ViewTabs";
+import CovidChart from "./components/CovidChart/CovidChart";
+import CountrySelect from "./components/CovidChart/CountrySelect";
 import type { CovidRecord } from "./types/covid";
 import type { NumericFilterField } from "./types/stats";
 import { fetchCovidData } from "./services/covidApi";
 import { aggregateByCountry } from "./utils/aggregate";
 import { getMinMaxDates } from "./utils/date";
+import { buildTimeSeries } from "./utils/series";
 
 type ViewValue = "table" | "chart";
 
@@ -40,6 +43,9 @@ function App() {
   const [field, setField] = useState<NumericFilterField>("cases");
   const [minValue, setMinValue] = useState("");
   const [maxValue, setMaxValue] = useState("");
+
+  // Chart state: selected country for the chart (empty string => all countries)
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
 
   // Load data once; compute min/max to seed default filters.
   useEffect(() => {
@@ -119,6 +125,12 @@ function App() {
     setMaxValue(next);
   }, []);
 
+  const handleSelectedCountryChange = useCallback((next: string) => {
+    // DEBUG: track selected country for chart view
+    console.log("App selectedCountry changed:", next);
+    setSelectedCountry(next);
+  }, []);
+
   const handleReset = useCallback(() => {
     // Reset all filters back to defaults (date range + field filters)
     console.log("App reset triggered"); // DEBUG remove later
@@ -144,11 +156,24 @@ function App() {
     [countryQuery, field, from, maxValue, minValue, to]
   );
 
+  // Country list for the chart dropdown: unique names from raw records, sorted.
+  const countryOptions = useMemo(() => {
+    const unique = new Set<string>();
+    records.forEach((r) => unique.add(r.countriesAndTerritories));
+    return Array.from(unique).sort((a, b) => a.localeCompare(b));
+  }, [records]);
+
   // Aggregation memoized for performance; recompute when records or any filter changes.
   const rows = useMemo(() => {
     if (!records.length) return [];
     return aggregateByCountry(records, filters);
   }, [filters, records]);
+
+  // Chart time series uses raw records + dateRange + selectedCountry; recomputes on those changes.
+  const chartData = useMemo(() => {
+    if (!records.length) return [];
+    return buildTimeSeries(records, filters, selectedCountry === "" ? null : selectedCountry);
+  }, [filters, records, selectedCountry]);
 
   // DEBUG logs: track filter changes and resulting row count.
   useEffect(() => {
@@ -158,6 +183,10 @@ function App() {
   useEffect(() => {
     console.debug("[App] Rows recomputed:", rows.length);
   }, [rows]);
+
+  useEffect(() => {
+    console.debug("[App] Chart data recomputed:", chartData.length);
+  }, [chartData]);
 
   return (
     <div
@@ -220,15 +249,14 @@ function App() {
           )}
         </div>
       ) : (
-        // Chart view placeholder to be replaced with real chart component
-        <div
-          style={{
-            padding: "12px",
-            border: "1px dashed #cbd5e1",
-            borderRadius: "8px",
-          }}
-        >
-          Chart will be here
+        // Chart view: Country selector + time series chart reacting to dateRange + selectedCountry.
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          <CountrySelect
+            countries={countryOptions}
+            value={selectedCountry}
+            onChange={handleSelectedCountryChange}
+          />
+          <CovidChart data={chartData} loading={loading} error={error} />
         </div>
       )}
     </div>
