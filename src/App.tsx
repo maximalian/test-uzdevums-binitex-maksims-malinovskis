@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "./App.css";
 import CountrySearch from "./components/FiltersBar/CountrySearch";
 import CovidTable from "./components/CovidTable/CovidTable";
@@ -7,82 +7,74 @@ import FieldRangeFilter from "./components/FiltersBar/FieldRangeFilter";
 import ResetButton from "./components/FiltersBar/ResetButton";
 import ViewTabs from "./components/ViewTabs/ViewTabs";
 import type { CovidRecord } from "./types/covid";
-import type { CountryRow } from "./types/stats";
+import type { NumericFilterField } from "./types/stats";
 import { fetchCovidData } from "./services/covidApi";
 import { aggregateByCountry } from "./utils/aggregate";
 import { getMinMaxDates } from "./utils/date";
 
 type ViewValue = "table" | "chart";
-type FieldKey = "cases" | "deaths" | "casesPer1000" | "deathsPer1000";
 
 // Default stub dates for Stage 3; will be replaced with real min/max from data
 const DEFAULT_MIN_DATE = new Date("2019-12-01");
 const DEFAULT_MAX_DATE = new Date("2020-08-28");
 
 function App() {
-  // View mode toggle between table/chart
+  // State: raw records + loading/error
+  const [records, setRecords] = useState<CovidRecord[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // State: view mode toggle between table/chart
   const [view, setView] = useState<ViewValue>("table");
-  // Date range state (stubbed defaults for now; will be replaced by fetched min/max)
+
+  // State: date range (defaults will be replaced by fetched min/max)
   const [minDate, setMinDate] = useState<Date>(DEFAULT_MIN_DATE);
   const [maxDate, setMaxDate] = useState<Date>(DEFAULT_MAX_DATE);
   const [from, setFrom] = useState<Date>(DEFAULT_MIN_DATE);
   const [to, setTo] = useState<Date>(DEFAULT_MAX_DATE);
-  // Country filter
+
+  // State: country filter
   const [countryQuery, setCountryQuery] = useState("");
-  // Field/value filters
-  const [field, setField] = useState<FieldKey>("cases");
+
+  // State: numeric field/min/max filters
+  const [field, setField] = useState<NumericFilterField>("cases");
   const [minValue, setMinValue] = useState("");
   const [maxValue, setMaxValue] = useState("");
-  // Stage 2 debug: track loaded row count to ensure data pipeline still works
-  const [rowCount, setRowCount] = useState<number | null>(null);
-  // Aggregated data and fetch status for table rendering
-  const [aggregatedData, setAggregatedData] = useState<CountryRow[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Load data once to keep aggregation pipeline validated; will be connected to filters later
+  // Load data once; compute min/max to seed default filters.
   useEffect(() => {
-    const loadAndAggregate = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
         setError(null);
         const data = await fetchCovidData();
-        const records: CovidRecord[] = data.records ?? [];
-        if (!records.length) {
+        const incoming: CovidRecord[] = data.records ?? [];
+        if (!incoming.length) {
           throw new Error("No records returned from API.");
         }
-        // Compute min/max dates from data to wire into filters on the next iteration
-        const { min, max } = getMinMaxDates(records);
+
+        const { min, max } = getMinMaxDates(incoming);
+        setRecords(incoming);
         setMinDate(min);
         setMaxDate(max);
+
+        // default filters: set range to full data span on first load
         setFrom(min);
         setTo(max);
 
-        const filters = {
-          dateRange: { from: min, to: max },
-          countryQuery: "",
-        };
-        const aggregated = aggregateByCountry(records, filters);
-
-        // DEBUG: verify data loading + aggregation are still intact
-        console.log("Loaded records:", records.length);
-        console.log("Date range from data:", { min, max });
-        console.log("Aggregated preview:", aggregated.slice(0, 3));
-
-        setRowCount(records.length);
-        setAggregatedData(aggregated);
+        // DEBUG: verify data arrival
+        console.log("[App] Loaded records:", incoming.length);
+        console.log("[App] Date bounds:", { min, max });
       } catch (err) {
-        console.error("Aggregation failed:", err);
-        setAggregatedData([]);
+        console.error("Data load failed:", err);
+        setRecords([]);
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
     };
 
-    loadAndAggregate();
-    // We intentionally omit dependencies to run only once for debug-loading
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    loadData();
   }, []);
 
   const handleChangeView = useCallback((next: ViewValue) => {
@@ -109,7 +101,7 @@ function App() {
     setCountryQuery(next);
   }, []);
 
-  const handleFieldChange = useCallback((next: FieldKey) => {
+  const handleFieldChange = useCallback((next: NumericFilterField) => {
     // DEBUG remove later: log field change
     console.log("App field changed:", next);
     setField(next);
@@ -138,6 +130,35 @@ function App() {
     setTo(maxDate);
   }, [maxDate, minDate]);
 
+  // Filters object memoized for stable refs and easier logging.
+  const filters = useMemo(
+    () => ({
+      dateRange: { from, to },
+      countryQuery,
+      numericFilter: {
+        field,
+        min: minValue,
+        max: maxValue,
+      },
+    }),
+    [countryQuery, field, from, maxValue, minValue, to]
+  );
+
+  // Aggregation memoized for performance; recompute when records or any filter changes.
+  const rows = useMemo(() => {
+    if (!records.length) return [];
+    return aggregateByCountry(records, filters);
+  }, [filters, records]);
+
+  // DEBUG logs: track filter changes and resulting row count.
+  useEffect(() => {
+    console.debug("[App] Filters updated:", filters);
+  }, [filters]);
+
+  useEffect(() => {
+    console.debug("[App] Rows recomputed:", rows.length);
+  }, [rows]);
+
   return (
     <div
       style={{
@@ -151,7 +172,7 @@ function App() {
     >
       <h1>COVID-19 Statistics</h1>
 
-      {/* Date range filter block; will feed into data pipeline on next stage */}
+      {/* Date range filter block; feeds date state into aggregation */}
       <DateRangeFilter
         from={from}
         to={to}
@@ -192,8 +213,10 @@ function App() {
             <p>Loading...</p>
           ) : error ? (
             <p>Error: {error}</p>
+          ) : rows.length === 0 ? (
+            <p>Ничего не найдено</p>
           ) : (
-            <CovidTable data={aggregatedData} />
+            <CovidTable data={rows} />
           )}
         </div>
       ) : (
@@ -207,11 +230,6 @@ function App() {
         >
           Chart will be here
         </div>
-      )}
-
-      {/* Debug status: ensures data pipeline still runs while UI is a skeleton */}
-      {rowCount !== null && (
-        <p style={{ color: "#475569" }}>Loaded rows (debug): {rowCount}</p>
       )}
     </div>
   );

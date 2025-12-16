@@ -10,6 +10,13 @@ export type CountryRow = {
   population: number; // Raw population to enable per-1k calculations.
 };
 
+// Numeric field options that can be filtered in the aggregate view.
+export type NumericFilterField =
+  | 'cases'
+  | 'deaths'
+  | 'casesPer1000'
+  | 'deathsPer1000';
+
 // Inclusive date range used to filter aggregated records.
 export type DateRangeFilter = {
   from: Date;
@@ -21,8 +28,13 @@ export type CountryFilter = {
   countryQuery: string;
 };
 
-// Aggregation-level filters; extendable with numeric min/max later.
+// Aggregation-level filters used by aggregateByCountry + filtering UI.
 export type AggregationFilters = {
   dateRange: DateRangeFilter;
-  countryQuery?: string;
+  countryQuery: string;
+  numericFilter: {
+    field: NumericFilterField;
+    min: string; // Keep as string to allow validation and preserve raw user input.
+    max: string; // Empty string means "not set", so parsing happens later.
+  };
 };

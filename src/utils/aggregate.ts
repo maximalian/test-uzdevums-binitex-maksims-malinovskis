@@ -20,7 +20,7 @@ const calcPerThousand = (value: number, population: number): number => {
 };
 
 /**
- * Aggregates daily Covid records by country and applies date/country filters.
+ * Aggregates daily Covid records by country and applies date/country/numeric filters.
  * Country key: uses ECDC `countriesAndTerritories` (underscores preserved for consistency).
  */
 export function aggregateByCountry(records: CovidRecord[], filters: AggregationFilters): CountryRow[] {
@@ -69,13 +69,52 @@ export function aggregateByCountry(records: CovidRecord[], filters: AggregationF
     deathsPer1000: calcPerThousand(agg.deathsInPeriod, agg.population),
   }));
 
-  // optional country filter (case-insensitive substring)
-  if (filters.countryQuery && filters.countryQuery.trim() !== "") {
-    const q = filters.countryQuery.trim().toLowerCase();
+  const rowsBeforeFilters = rows.length;
+
+  // filtering: country (case-insensitive substring)
+  const countryQuery = filters.countryQuery.trim();
+  if (countryQuery !== "") {
+    const q = countryQuery.toLowerCase();
     rows = rows.filter((row) => row.country.toLowerCase().includes(q));
   }
 
-  // stable alphabetical ordering by country name
+  const rowsAfterCountryFilter = rows.length;
+
+  // filtering: numeric field min/max (empty strings mean "no bound"; NaN is ignored)
+  const { field, min, max } = filters.numericFilter;
+  const numericKey = {
+    cases: "casesInPeriod",
+    deaths: "deathsInPeriod",
+    casesPer1000: "casesPer1000",
+    deathsPer1000: "deathsPer1000",
+  } as const;
+  const minValue = min.trim() === "" ? null : Number(min);
+  const maxValue = max.trim() === "" ? null : Number(max);
+  const hasValidMin = minValue !== null && !Number.isNaN(minValue);
+  const hasValidMax = maxValue !== null && !Number.isNaN(maxValue);
+
+  if (hasValidMin || hasValidMax) {
+    rows = rows.filter((row) => {
+      const numericFieldKey = numericKey[field];
+      const value = row[numericFieldKey];
+      if (hasValidMin && value < (minValue as number)) return false;
+      if (hasValidMax && value > (maxValue as number)) return false;
+      return true;
+    });
+  }
+
+  const rowsAfterNumericFilter = rows.length;
+
+  // DEBUG-only counts to trace filtering (easy to remove)
+  if (import.meta.env?.DEV) {
+    console.debug("[aggregateByCountry] rows", {
+      beforeFilters: rowsBeforeFilters,
+      afterCountry: rowsAfterCountryFilter,
+      afterNumeric: rowsAfterNumericFilter,
+    });
+  }
+
+  // sorting: stable alphabetical ordering by country name
   rows.sort((a, b) => a.country.localeCompare(b.country));
 
   return rows;
@@ -133,9 +172,13 @@ export function debugAggregateSample(): void {
       to: parseApiDate("02/12/2019"),
     },
     countryQuery: "",
+    numericFilter: {
+      field: "cases",
+      min: "",
+      max: "",
+    },
   };
 
   const aggregated = aggregateByCountry(sampleRecords, filters);
-  // eslint-disable-next-line no-console
   console.log("Sample aggregation:", aggregated);
 }
