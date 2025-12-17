@@ -35,6 +35,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
   const fromInputRef = useRef<HTMLInputElement>(null);
   const toInputRef = useRef<HTMLInputElement>(null);
 
+  const isCustomRange = from !== minDate || to !== maxDate;
+
   // Precompute formatted values to keep JSX tidy and avoid repeated formatting
   const { fromValue, toValue, minValue, maxValue } = useMemo(
     () => ({
@@ -66,10 +68,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
       to,
       minDate,
       maxDate,
+      isCustomRange,
       isFromInvalid,
       isToInvalid,
     });
-  }, [from, to, minDate, maxDate, isFromInvalid, isToInvalid]);
+  }, [from, to, minDate, maxDate, isCustomRange, isFromInvalid, isToInvalid]);
 
   // Handle "from" date changes and propagate to parent with parsed Date
   const handleFromChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -173,13 +176,18 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
 
       <div className="d-flex flex-column" style={{ minWidth: 180 }}>
         <span className="form-label mb-1">&nbsp;</span>
-        <button
-          type="button"
-          className="btn btn-outline-secondary btn-sm"
-          onClick={handleShowAllTime}
-        >
-          Показать всё время
-        </button>
+        {isCustomRange && (
+          <>
+            {/* UX-требование задания: показываем кнопку только когда период отличается от minDate/maxDate. */}
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              onClick={handleShowAllTime}
+            >
+              Показать всё время
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
