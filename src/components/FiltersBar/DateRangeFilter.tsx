@@ -60,32 +60,28 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        gap: "12px",
-        alignItems: "flex-end",
-      }}
-    >
-      <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <span>Период от</span>
+    <div className="d-flex flex-wrap gap-3 align-items-end">
+      <label className="d-flex flex-column" style={{ minWidth: 180 }}>
+        <span className="form-label mb-1">Период от</span>
         <input
           type="date"
           value={fromValue}
           min={minValue}
           max={maxValue}
           onChange={handleFromChange}
+          className="form-control"
         />
       </label>
 
-      <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <span>до</span>
+      <label className="d-flex flex-column" style={{ minWidth: 180 }}>
+        <span className="form-label mb-1">до</span>
         <input
           type="date"
           value={toValue}
           min={minValue}
           max={maxValue}
           onChange={handleToChange}
+          className="form-control"
         />
       </label>
     </div>

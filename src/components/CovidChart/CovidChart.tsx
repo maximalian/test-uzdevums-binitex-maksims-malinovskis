@@ -18,7 +18,12 @@ type CovidChartProps = {
   height?: number;
 };
 
-const CovidChart: FC<CovidChartProps> = ({ data, loading, error, height = 400 }) => {
+const CovidChart: FC<CovidChartProps> = ({
+  data,
+  loading,
+  error,
+  height = 400,
+}) => {
   // DEBUG: log a small slice and total length every render to trace inputs.
   if (import.meta.env?.DEV) {
     console.debug("[CovidChart] sample", data.slice(0, 5), "len", data.length);
