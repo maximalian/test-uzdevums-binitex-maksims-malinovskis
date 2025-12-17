@@ -22,7 +22,12 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
 
   // Rendering fallback when there are no rows to display
   if (rows.length === 0) {
-    return <p>No data available</p>;
+    // Bootstrap alert keeps the empty state visually consistent inside a card.
+    return (
+      <div className="alert alert-warning mb-0" role="alert">
+        No data available
+      </div>
+    );
   }
 
   // Handle clicks on table headers to toggle sort column/direction without mutating props
@@ -71,126 +76,117 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
     setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1));
   };
 
+  const stickyThClass = "position-sticky top-0 bg-light";
+
   return (
     <>
-      {/* Rendering the statistics table with semantic HTML elements */}
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-        }}
-      >
-        <thead>
-          <tr>
-            <th
-              style={{ textAlign: "left", padding: "8px", borderBottom: "1px solid #e2e8f0" }}
-              onClick={() => handleHeaderClick("country")}
-            >
-              Страна{" "}
-              {sortField === "country" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
-            </th>
-            <th
-              style={{ textAlign: "right", padding: "8px", borderBottom: "1px solid #e2e8f0" }}
-              onClick={() => handleHeaderClick("casesInPeriod")}
-            >
-              Cases (за период){" "}
-              {sortField === "casesInPeriod" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
-            </th>
-            <th
-              style={{ textAlign: "right", padding: "8px", borderBottom: "1px solid #e2e8f0" }}
-              onClick={() => handleHeaderClick("deathsInPeriod")}
-            >
-              Deaths (за период){" "}
-              {sortField === "deathsInPeriod" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
-            </th>
-            <th
-              style={{ textAlign: "right", padding: "8px", borderBottom: "1px solid #e2e8f0" }}
-              onClick={() => handleHeaderClick("casesTotalAllTime")}
-            >
-              Cases Total (всё время){" "}
-              {sortField === "casesTotalAllTime" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
-            </th>
-            <th
-              style={{ textAlign: "right", padding: "8px", borderBottom: "1px solid #e2e8f0" }}
-              onClick={() => handleHeaderClick("deathsTotalAllTime")}
-            >
-              Deaths Total (всё время){" "}
-              {sortField === "deathsTotalAllTime" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
-            </th>
-            <th
-              style={{ textAlign: "right", padding: "8px", borderBottom: "1px solid #e2e8f0" }}
-              onClick={() => handleHeaderClick("casesPer1000")}
-            >
-              Cases per 1000{" "}
-              {sortField === "casesPer1000" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
-            </th>
-            <th
-              style={{ textAlign: "right", padding: "8px", borderBottom: "1px solid #e2e8f0" }}
-              onClick={() => handleHeaderClick("deathsPer1000")}
-            >
-              Deaths per 1000{" "}
-              {sortField === "deathsPer1000" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {visibleRows.map((row) => (
-            // Table row: one country's statistics in a single <tr>
-            <tr key={row.country}>
-              <td style={{ padding: "8px", borderBottom: "1px solid #e2e8f0" }}>{row.country}</td>
-              <td
-                style={{ padding: "8px", textAlign: "right", borderBottom: "1px solid #e2e8f0" }}
+      {/* `table-responsive` adds horizontal scroll on small screens so columns don't squish into unreadable layout. */}
+      <div className="table-responsive">
+        <table className="table table-striped table-hover table-sm mb-0">
+          {/* `table-light` makes the header more readable against striped rows. */}
+          <thead className="table-light">
+            <tr>
+              <th
+                scope="col"
+                className={`${stickyThClass} text-start text-nowrap`}
+                style={{ zIndex: 1 }}
+                onClick={() => handleHeaderClick("country")}
               >
-                {row.casesInPeriod.toLocaleString("en-US")}
-              </td>
-              <td
-                style={{ padding: "8px", textAlign: "right", borderBottom: "1px solid #e2e8f0" }}
+                Страна {sortField === "country" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+              </th>
+              <th
+                scope="col"
+                className={`${stickyThClass} text-end text-nowrap`}
+                style={{ zIndex: 1 }}
+                onClick={() => handleHeaderClick("casesInPeriod")}
               >
-                {row.deathsInPeriod.toLocaleString("en-US")}
-              </td>
-              <td
-                style={{ padding: "8px", textAlign: "right", borderBottom: "1px solid #e2e8f0" }}
+                {/* WHY `text-end`: numbers align by digits and are easier to scan vertically. */}
+                Cases (за период){" "}
+                {sortField === "casesInPeriod" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+              </th>
+              <th
+                scope="col"
+                className={`${stickyThClass} text-end text-nowrap`}
+                style={{ zIndex: 1 }}
+                onClick={() => handleHeaderClick("deathsInPeriod")}
               >
-                {row.casesTotalAllTime.toLocaleString("en-US")}
-              </td>
-              <td
-                style={{ padding: "8px", textAlign: "right", borderBottom: "1px solid #e2e8f0" }}
+                Deaths (за период){" "}
+                {sortField === "deathsInPeriod" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+              </th>
+              <th
+                scope="col"
+                className={`${stickyThClass} text-end text-nowrap`}
+                style={{ zIndex: 1 }}
+                onClick={() => handleHeaderClick("casesTotalAllTime")}
               >
-                {row.deathsTotalAllTime.toLocaleString("en-US")}
-              </td>
-              <td
-                style={{ padding: "8px", textAlign: "right", borderBottom: "1px solid #e2e8f0" }}
+                Cases Total (всё время){" "}
+                {sortField === "casesTotalAllTime" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+              </th>
+              <th
+                scope="col"
+                className={`${stickyThClass} text-end text-nowrap`}
+                style={{ zIndex: 1 }}
+                onClick={() => handleHeaderClick("deathsTotalAllTime")}
               >
-                {row.casesPer1000.toLocaleString("en-US", { maximumFractionDigits: 2 })}
-              </td>
-              <td
-                style={{ padding: "8px", textAlign: "right", borderBottom: "1px solid #e2e8f0" }}
+                Deaths Total (всё время){" "}
+                {sortField === "deathsTotalAllTime"
+                  ? sortDirection === "asc"
+                    ? "▲"
+                    : "▼"
+                  : ""}
+              </th>
+              <th
+                scope="col"
+                className={`${stickyThClass} text-end text-nowrap`}
+                style={{ zIndex: 1 }}
+                onClick={() => handleHeaderClick("casesPer1000")}
               >
-                {row.deathsPer1000.toLocaleString("en-US", { maximumFractionDigits: 2 })}
-              </td>
+                Cases per 1000{" "}
+                {sortField === "casesPer1000" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+              </th>
+              <th
+                scope="col"
+                className={`${stickyThClass} text-end text-nowrap`}
+                style={{ zIndex: 1 }}
+                onClick={() => handleHeaderClick("deathsPer1000")}
+              >
+                Deaths per 1000{" "}
+                {sortField === "deathsPer1000" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {visibleRows.map((row) => (
+              <tr key={row.country}>
+                <td className="text-start">{row.country}</td>
+                <td className="text-end">{row.casesInPeriod.toLocaleString("en-US")}</td>
+                <td className="text-end">{row.deathsInPeriod.toLocaleString("en-US")}</td>
+                <td className="text-end">{row.casesTotalAllTime.toLocaleString("en-US")}</td>
+                <td className="text-end">{row.deathsTotalAllTime.toLocaleString("en-US")}</td>
+                <td className="text-end">{row.casesPer1000.toFixed(2)}</td>
+                <td className="text-end">{row.deathsPer1000.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Pagination controls: show current page and navigate with bounds checking */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "12px",
-          justifyContent: "flex-end",
-          marginTop: "12px",
-        }}
-      >
-        <button type="button" onClick={handlePrevPage} disabled={safePage === 0}>
+      {/* Pagination controls: keep them compact and aligned to the right. */}
+      <div className="d-flex align-items-center justify-content-end gap-2 mt-3">
+        <button
+          type="button"
+          className="btn btn-outline-secondary btn-sm"
+          onClick={handlePrevPage}
+          disabled={safePage === 0}
+        >
           Previous
         </button>
-        <span>
+        <span className="text-muted small">
           Page {safePage + 1} of {totalPages}
         </span>
         <button
           type="button"
+          className="btn btn-outline-secondary btn-sm"
           onClick={handleNextPage}
           disabled={safePage >= totalPages - 1}
         >

@@ -4,10 +4,13 @@ import CountrySearch from "./components/FiltersBar/CountrySearch";
 import CovidTable from "./components/CovidTable/CovidTable";
 import DateRangeFilter from "./components/FiltersBar/DateRangeFilter";
 import FieldRangeFilter from "./components/FiltersBar/FieldRangeFilter";
+import FiltersPanel from "./components/FiltersBar/FiltersPanel";
 import ResetButton from "./components/FiltersBar/ResetButton";
 import ViewTabs from "./components/ViewTabs/ViewTabs";
 import CovidChart from "./components/CovidChart/CovidChart";
 import CountrySelect from "./components/CovidChart/CountrySelect";
+import ErrorState from "./components/common/ErrorState";
+import LoadingState from "./components/common/LoadingState";
 import type { CovidRecord } from "./types/covid";
 import type { NumericFilterField } from "./types/stats";
 import { fetchCovidData } from "./services/covidApi";
@@ -188,77 +191,101 @@ function App() {
     console.debug("[App] Chart data recomputed:", chartData.length);
   }, [chartData]);
 
+  // Loading/Error UI is extracted into separate components for reusability and a cleaner App.tsx.
+  const showLoading = loading;
+  const showError = !loading && error;
+
   return (
-    <div
-      style={{
-        padding: "24px",
-        maxWidth: "1080px",
-        margin: "0 auto",
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
-      }}
-    >
-      <h1>COVID-19 Statistics</h1>
+    // Layout wrapper
+    <div className="container py-4">
+      <div className="d-flex flex-column gap-3">
+        {/* Header */}
+        <header className="mb-2">
+          <h1 className="h3 mb-1">COVID-19 Statistics</h1>
+          <div className="text-muted small">Test task</div>
+        </header>
 
-      {/* Date range filter block; feeds date state into aggregation */}
-      <DateRangeFilter
-        from={from}
-        to={to}
-        minDate={minDate}
-        maxDate={maxDate}
-        onChangeFrom={handleChangeFrom}
-        onChangeTo={handleChangeTo}
-      />
-
-      {/* View tabs switcher (table/chart modes) */}
-      <ViewTabs value={view} onChange={handleChangeView} />
-
-      {view === "table" ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          {/* Table view filters: country search + numeric range + reset */}
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "12px",
-              alignItems: "flex-end",
-            }}
-          >
-            <CountrySearch value={countryQuery} onChange={handleCountryChange} />
-            <FieldRangeFilter
-              field={field}
-              minValue={minValue}
-              maxValue={maxValue}
-              onChangeField={handleFieldChange}
-              onChangeMin={handleMinValueChange}
-              onChangeMax={handleMaxValueChange}
-            />
-            <ResetButton onReset={handleReset} />
+        {showLoading ? (
+          <div className="card shadow-sm">
+            <div className="card-body">
+              <LoadingState />
+            </div>
           </div>
+        ) : showError ? (
+          <div className="card shadow-sm">
+            <div className="card-body">
+              <ErrorState message={`Error: ${error ?? "Unknown error"}`} />
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Filters panel */}
+            <div className="d-flex flex-column gap-3 mb-2">
+              {/* Date range filter block; feeds date state into aggregation */}
+              <div>
+                <DateRangeFilter
+                  from={from}
+                  to={to}
+                  minDate={minDate}
+                  maxDate={maxDate}
+                  onChangeFrom={handleChangeFrom}
+                  onChangeTo={handleChangeTo}
+                />
+              </div>
 
-          {/* Data table UI: show loading/error states, otherwise render the CovidTable with aggregated data */}
-          {loading ? (
-            <p>Loading...</p>
-          ) : error ? (
-            <p>Error: {error}</p>
-          ) : rows.length === 0 ? (
-            <p>Ничего не найдено</p>
-          ) : (
-            <CovidTable data={rows} />
-          )}
-        </div>
-      ) : (
-        // Chart view: Country selector + time series chart reacting to dateRange + selectedCountry.
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-          <CountrySelect
-            countries={countryOptions}
-            value={selectedCountry}
-            onChange={handleSelectedCountryChange}
-          />
-          <CovidChart data={chartData} loading={loading} error={error} />
-        </div>
-      )}
+              {/* View tabs switcher (table/chart modes) */}
+              <div>
+                <ViewTabs value={view} onChange={handleChangeView} />
+              </div>
+
+              {view === "table" ? (
+                <FiltersPanel title="Table filters">
+                  <CountrySearch value={countryQuery} onChange={handleCountryChange} />
+                  <FieldRangeFilter
+                    field={field}
+                    minValue={minValue}
+                    maxValue={maxValue}
+                    onChangeField={handleFieldChange}
+                    onChangeMin={handleMinValueChange}
+                    onChangeMax={handleMaxValueChange}
+                  />
+                  <ResetButton onReset={handleReset} />
+                </FiltersPanel>
+              ) : null}
+            </div>
+
+            {/* Content card */}
+            <div className="card shadow-sm">
+              <div className="card-body">
+                {view === "table" ? (
+                  rows.length === 0 ? (
+                    <div className="alert alert-warning mb-0" role="alert">
+                      Ничего не найдено
+                    </div>
+                  ) : (
+                    <>
+                      <div className="d-flex justify-content-between align-items-center mb-2">
+                        <span className="text-muted small">Rows: {rows.length}</span>
+                      </div>
+                      <CovidTable data={rows} />
+                    </>
+                  )
+                ) : (
+                  // Chart view: Country selector + time series chart reacting to dateRange + selectedCountry.
+                  <div className="d-flex flex-column gap-3">
+                    <CountrySelect
+                      countries={countryOptions}
+                      value={selectedCountry}
+                      onChange={handleSelectedCountryChange}
+                    />
+                    <CovidChart data={chartData} loading={loading} error={error} />
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

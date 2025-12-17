@@ -42,17 +42,10 @@ const FieldRangeFilter: FC<FieldRangeFilterProps> = ({
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "flex-end",
-        gap: "12px",
-        flexWrap: "wrap", // Wrap on small screens to avoid overflow
-      }}
-    >
-      <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <span>Фильтровать по полю</span>
-        <select value={field} onChange={handleFieldChange}>
+    <div className="d-flex flex-wrap gap-3 align-items-end">
+      <label className="d-flex flex-column" style={{ minWidth: 220 }}>
+        <span className="form-label mb-1">Фильтровать по полю</span>
+        <select value={field} onChange={handleFieldChange} className="form-select">
           <option value="cases">cases</option>
           <option value="deaths">deaths</option>
           <option value="casesPer1000">casesPer1000</option>
@@ -60,22 +53,24 @@ const FieldRangeFilter: FC<FieldRangeFilterProps> = ({
         </select>
       </label>
 
-      <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <span>значение от</span>
+      <label className="d-flex flex-column" style={{ minWidth: 140 }}>
+        <span className="form-label mb-1">значение от</span>
         <input
           type="text"
           value={minValue}
           onChange={handleMinChange}
+          className="form-control"
           // String-based input; numeric validation and red background will be added later
         />
       </label>
 
-      <label style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-        <span>значение до</span>
+      <label className="d-flex flex-column" style={{ minWidth: 140 }}>
+        <span className="form-label mb-1">значение до</span>
         <input
           type="text"
           value={maxValue}
           onChange={handleMaxChange}
+          className="form-control"
           // String-based input; numeric validation and red background will be added later
         />
       </label>

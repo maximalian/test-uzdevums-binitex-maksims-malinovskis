@@ -19,13 +19,8 @@ const ResetButton: FC<ResetButtonProps> = ({ onReset, disabled = false }) => {
       type="button"
       onClick={handleClick}
       disabled={disabled}
-      style={{
-        padding: "8px 12px",
-        border: "1px solid #ccc",
-        borderRadius: "6px",
-        backgroundColor: disabled ? "#f5f5f5" : "#ffffff",
-        cursor: disabled ? "not-allowed" : "pointer",
-      }}
+      className="btn btn-outline-secondary"
+      // `btn-outline-secondary` is noticeable but not "danger" (reset is reversible and not destructive).
     >
       Сбросить фильтры
     </button>

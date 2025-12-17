@@ -21,12 +21,12 @@ const CountrySelect: FC<CountrySelectProps> = ({ countries, value, onChange }) =
   };
 
   return (
-    <label style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      Страна
+    <label className="d-flex flex-column" style={{ maxWidth: 320 }}>
+      <span className="form-label mb-1">Страна</span>
       <select
         value={value}
         onChange={handleChange}
-        style={{ padding: "6px 8px", maxWidth: 260 }}
+        className="form-select"
         // Dropdown: first option uses '' to represent "all countries" so aggregations can include everyone.
       >
         <option value="">Все страны</option>
