@@ -1,5 +1,5 @@
 import type { ChangeEvent, FC } from "react";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 type DateRangeFilterProps = {
   from: Date;
@@ -46,6 +46,31 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
     [from, to, minDate, maxDate]
   );
 
+  // Visual-only validation:
+  // we do NOT clamp or block input because users can still type dates manually and we must not
+  // "fight" the native <input type="date"> UX; instead we highlight out-of-range values.
+  const isFromInvalid = from.getTime() < minDate.getTime() || from.getTime() > maxDate.getTime();
+  const isToInvalid = to.getTime() < minDate.getTime() || to.getTime() > maxDate.getTime();
+
+  // Limiting `min`/`max` is important: it prevents selecting dates outside the dataset range
+  // and avoids confusing "no data" states without changing any business logic.
+  useEffect(() => {
+    // DEBUG remove later: verify API-provided dataset bounds
+    console.log("DateRangeFilter bounds (min/max):", { minValue, maxValue });
+  }, [minValue, maxValue]);
+
+  useEffect(() => {
+    // DEBUG remove later: verify current values vs bounds
+    console.debug("DateRangeFilter dates (from/to/min/max):", {
+      from,
+      to,
+      minDate,
+      maxDate,
+      isFromInvalid,
+      isToInvalid,
+    });
+  }, [from, to, minDate, maxDate, isFromInvalid, isToInvalid]);
+
   // Handle "from" date changes and propagate to parent with parsed Date
   const handleFromChange = (event: ChangeEvent<HTMLInputElement>) => {
     const parsed = parseDateInputValue(event.target.value);
@@ -62,13 +87,19 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
     onChangeTo(parsed);
   };
 
+  // UX shortcut: quickly reset the period to the full data range (doesn't affect other filters).
+  const handleShowAllTime = () => {
+    onChangeFrom(minDate);
+    onChangeTo(maxDate);
+  };
+
   return (
     <div className="d-flex flex-wrap gap-3 align-items-end">
       <label className="d-flex flex-column" style={{ minWidth: 180 }}>
         <span className="form-label mb-1">Период от</span>
 
         {/* Calendar icon makes the native date picker more noticeable without changing existing input styles. */}
-        <div className="input-group">
+        <div className="input-group has-validation">
           <input
             ref={fromInputRef}
             type="date"
@@ -76,7 +107,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
             min={minValue}
             max={maxValue}
             onChange={handleFromChange}
-            className="form-control"
+            className={`form-control${isFromInvalid ? " is-invalid" : ""}`}
           />
           <span
             className="input-group-text"
@@ -98,6 +129,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
           >
             {"\u{1F4C5}"}
           </span>
+          <div className="invalid-feedback">Дата вне допустимого диапазона</div>
         </div>
       </label>
 
@@ -105,7 +137,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
         <span className="form-label mb-1">до</span>
 
         {/* Calendar icon makes the native date picker more noticeable without changing existing input styles. */}
-        <div className="input-group">
+        <div className="input-group has-validation">
           <input
             ref={toInputRef}
             type="date"
@@ -113,7 +145,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
             min={minValue}
             max={maxValue}
             onChange={handleToChange}
-            className="form-control"
+            className={`form-control${isToInvalid ? " is-invalid" : ""}`}
           />
           <span
             className="input-group-text"
@@ -135,8 +167,20 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
           >
             {"\u{1F4C5}"}
           </span>
+          <div className="invalid-feedback">Дата вне допустимого диапазона</div>
         </div>
       </label>
+
+      <div className="d-flex flex-column" style={{ minWidth: 180 }}>
+        <span className="form-label mb-1">&nbsp;</span>
+        <button
+          type="button"
+          className="btn btn-outline-secondary btn-sm"
+          onClick={handleShowAllTime}
+        >
+          Показать всё время
+        </button>
+      </div>
     </div>
   );
 };

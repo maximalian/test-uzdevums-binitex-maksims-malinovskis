@@ -4,7 +4,9 @@ type FieldKey = "cases" | "deaths" | "casesPer1000" | "deathsPer1000";
 
 type FieldRangeFilterProps = {
   field: FieldKey;
-  // Keep min/max as strings for now to allow easy validation messaging later
+  // `minValue`/`maxValue` intentionally stay `string`:
+  // users can type intermediate states like "-" / "." / "1e" and we must not block input.
+  // Parsing/validation for business filtering happens elsewhere; here we only show UI state.
   minValue: string;
   maxValue: string;
   onChangeField: (field: FieldKey) => void;
@@ -20,24 +22,31 @@ const FieldRangeFilter: FC<FieldRangeFilterProps> = ({
   onChangeMin,
   onChangeMax,
 }) => {
+  // Visual-only validation:
+  // we do NOT change filtering logic and do NOT block typing; we only add Bootstrap `is-invalid`.
+  const isValueValid = (value: string) => value === "" || !Number.isNaN(Number(value));
+
+  const minIsValid = isValueValid(minValue);
+  const maxIsValid = isValueValid(maxValue);
+
   const handleFieldChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const nextField = event.target.value as FieldKey;
-    // DEBUG remove later: verify field change wiring
-    console.log("FieldRangeFilter field changed:", nextField);
     onChangeField(nextField);
   };
 
   const handleMinChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextValue = event.target.value;
-    // DEBUG remove later: verify min value wiring
-    console.log("FieldRangeFilter min changed:", nextValue);
+    const nextIsValid = isValueValid(nextValue);
+    // DEBUG remove later: verify entered value + validation
+    console.log("FieldRangeFilter min changed:", { value: nextValue, isValid: nextIsValid });
     onChangeMin(nextValue);
   };
 
   const handleMaxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextValue = event.target.value;
-    // DEBUG remove later: verify max value wiring
-    console.log("FieldRangeFilter max changed:", nextValue);
+    const nextIsValid = isValueValid(nextValue);
+    // DEBUG remove later: verify entered value + validation
+    console.log("FieldRangeFilter max changed:", { value: nextValue, isValid: nextIsValid });
     onChangeMax(nextValue);
   };
 
@@ -59,9 +68,9 @@ const FieldRangeFilter: FC<FieldRangeFilterProps> = ({
           type="text"
           value={minValue}
           onChange={handleMinChange}
-          className="form-control"
-          // String-based input; numeric validation and red background will be added later
+          className={`form-control${minIsValid ? "" : " is-invalid"}`}
         />
+        <div className="invalid-feedback">Введите числовое значение</div>
       </label>
 
       <label className="d-flex flex-column" style={{ minWidth: 140 }}>
@@ -70,9 +79,9 @@ const FieldRangeFilter: FC<FieldRangeFilterProps> = ({
           type="text"
           value={maxValue}
           onChange={handleMaxChange}
-          className="form-control"
-          // String-based input; numeric validation and red background will be added later
+          className={`form-control${maxIsValid ? "" : " is-invalid"}`}
         />
+        <div className="invalid-feedback">Введите числовое значение</div>
       </label>
     </div>
   );

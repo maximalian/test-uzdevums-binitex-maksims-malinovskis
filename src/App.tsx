@@ -20,10 +20,6 @@ import { buildTimeSeries } from "./utils/series";
 
 type ViewValue = "table" | "chart";
 
-// Default stub dates for Stage 3; will be replaced with real min/max from data
-const DEFAULT_MIN_DATE = new Date("2019-12-01");
-const DEFAULT_MAX_DATE = new Date("2020-08-28");
-
 function App() {
   // State: raw records + loading/error
   const [records, setRecords] = useState<CovidRecord[]>([]);
@@ -33,11 +29,13 @@ function App() {
   // State: view mode toggle between table/chart
   const [view, setView] = useState<ViewValue>("table");
 
-  // State: date range (defaults will be replaced by fetched min/max)
-  const [minDate, setMinDate] = useState<Date>(DEFAULT_MIN_DATE);
-  const [maxDate, setMaxDate] = useState<Date>(DEFAULT_MAX_DATE);
-  const [from, setFrom] = useState<Date>(DEFAULT_MIN_DATE);
-  const [to, setTo] = useState<Date>(DEFAULT_MAX_DATE);
+  // NOTE: DEFAULT_* stub dates were removed because we now have real min/max bounds from the API.
+  // We keep date state as `Date | null` until the first successful load to avoid rendering the UI
+  // with incorrect bounds and to guarantee `DateRangeFilter` never receives uninitialized dates.
+  const [minDate, setMinDate] = useState<Date | null>(null);
+  const [maxDate, setMaxDate] = useState<Date | null>(null);
+  const [from, setFrom] = useState<Date | null>(null);
+  const [to, setTo] = useState<Date | null>(null);
 
   // State: country filter
   const [countryQuery, setCountryQuery] = useState("");
@@ -141,21 +139,27 @@ function App() {
     setField("cases");
     setMinValue("");
     setMaxValue("");
+    if (!minDate || !maxDate) return;
     setFrom(minDate);
     setTo(maxDate);
   }, [maxDate, minDate]);
 
+  const datesReady = Boolean(minDate && maxDate && from && to);
+
   // Filters object memoized for stable refs and easier logging.
   const filters = useMemo(
-    () => ({
-      dateRange: { from, to },
-      countryQuery,
-      numericFilter: {
-        field,
-        min: minValue,
-        max: maxValue,
-      },
-    }),
+    () => {
+      if (!from || !to) return null;
+      return {
+        dateRange: { from, to },
+        countryQuery,
+        numericFilter: {
+          field,
+          min: minValue,
+          max: maxValue,
+        },
+      };
+    },
     [countryQuery, field, from, maxValue, minValue, to]
   );
 
@@ -168,13 +172,13 @@ function App() {
 
   // Aggregation memoized for performance; recompute when records or any filter changes.
   const rows = useMemo(() => {
-    if (!records.length) return [];
+    if (!records.length || !filters) return [];
     return aggregateByCountry(records, filters);
   }, [filters, records]);
 
   // Chart time series uses raw records + dateRange + selectedCountry; recomputes on those changes.
   const chartData = useMemo(() => {
-    if (!records.length) return [];
+    if (!records.length || !filters) return [];
     return buildTimeSeries(records, filters, selectedCountry === "" ? null : selectedCountry);
   }, [filters, records, selectedCountry]);
 
@@ -192,8 +196,8 @@ function App() {
   }, [chartData]);
 
   // Loading/Error UI is extracted into separate components for reusability and a cleaner App.tsx.
-  const showLoading = loading;
-  const showError = !loading && error;
+  const showLoading = loading || (!error && !datesReady);
+  const showError = !showLoading && error;
 
   return (
     // Layout wrapper
@@ -224,10 +228,10 @@ function App() {
               {/* Date range filter block; feeds date state into aggregation */}
               <div>
                 <DateRangeFilter
-                  from={from}
-                  to={to}
-                  minDate={minDate}
-                  maxDate={maxDate}
+                  from={from!}
+                  to={to!}
+                  minDate={minDate!}
+                  maxDate={maxDate!}
                   onChangeFrom={handleChangeFrom}
                   onChangeTo={handleChangeTo}
                 />

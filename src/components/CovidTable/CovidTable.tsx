@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import type { ChangeEvent, FC } from "react";
 import { useState } from "react";
 import type { CountryRow } from "../../types/stats";
 
@@ -7,8 +7,8 @@ type CovidTableProps = {
   data?: CountryRow[];
 };
 
-// Simple client-side pagination: show 20 rows per page by default
-const ROWS_PER_PAGE = 20;
+type PageSize = 10 | 20 | 50;
+const PAGE_SIZE_OPTIONS: readonly PageSize[] = [10, 20, 50];
 
 const CovidTable: FC<CovidTableProps> = ({ data }) => {
   // Sorting state: which column is active and whether it is ascending or descending
@@ -16,6 +16,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   // Pagination state: current page index (0-based)
   const [currentPage, setCurrentPage] = useState<number>(0);
+  const [pageSize, setPageSize] = useState<PageSize>(20);
 
   // Normalize data: keep hooks unconditional, use an empty array when data is missing
   const rows = data ?? [];
@@ -41,6 +42,13 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
     }
   };
 
+  const handlePageSizeChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const nextSize = Number(event.target.value) as PageSize;
+    setPageSize(nextSize);
+    // Changing page size can change the total page count; resetting prevents landing on an out-of-range page.
+    setCurrentPage(0);
+  };
+
   // Copy the input array to avoid mutating props, then sort based on active column and direction
   const sortedData = [...rows].sort((a, b) => {
     const aValue = a[sortField];
@@ -61,11 +69,11 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
   });
 
   // Pagination: compute slice boundaries and render only the visible portion
-  const totalPages = Math.max(1, Math.ceil(sortedData.length / ROWS_PER_PAGE));
+  const totalPages = Math.max(1, Math.ceil(sortedData.length / pageSize));
   const safePage = Math.min(currentPage, totalPages - 1);
-  const startIndex = safePage * ROWS_PER_PAGE;
+  const startIndex = safePage * pageSize;
   // Use slice to create a view of the current page without mutating the sorted array
-  const visibleRows = sortedData.slice(startIndex, startIndex + ROWS_PER_PAGE);
+  const visibleRows = sortedData.slice(startIndex, startIndex + pageSize);
 
   // Navigation handlers with bounds checking to prevent going out of range
   const handlePrevPage = () => {
@@ -171,27 +179,47 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
         </table>
       </div>
 
-      {/* Pagination controls: keep them compact and aligned to the right. */}
-      <div className="d-flex align-items-center justify-content-end gap-2 mt-3">
-        <button
-          type="button"
-          className="btn btn-outline-secondary btn-sm"
-          onClick={handlePrevPage}
-          disabled={safePage === 0}
-        >
-          Previous
-        </button>
-        <span className="text-muted small">
-          Page {safePage + 1} of {totalPages}
-        </span>
-        <button
-          type="button"
-          className="btn btn-outline-secondary btn-sm"
-          onClick={handleNextPage}
-          disabled={safePage >= totalPages - 1}
-        >
-          Next
-        </button>
+      {/* Pagination controls + page size selector (both affect visibleRows). */}
+      <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+        <div className="d-flex align-items-center gap-2">
+          <label htmlFor="covidTablePageSize" className="form-label small text-muted mb-0">
+            Строк на странице
+          </label>
+          <select
+            id="covidTablePageSize"
+            className="form-select form-select-sm w-auto"
+            value={pageSize}
+            onChange={handlePageSizeChange}
+          >
+            {PAGE_SIZE_OPTIONS.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="d-flex align-items-center gap-2">
+          <button
+            type="button"
+            className="btn btn-outline-secondary btn-sm"
+            onClick={handlePrevPage}
+            disabled={safePage === 0}
+          >
+            Previous
+          </button>
+          <span className="text-muted small">
+            Page {safePage + 1} of {totalPages}
+          </span>
+          <button
+            type="button"
+            className="btn btn-outline-secondary btn-sm"
+            onClick={handleNextPage}
+            disabled={safePage >= totalPages - 1}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </>
   );
