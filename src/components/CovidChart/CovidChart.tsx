@@ -34,7 +34,7 @@ const CovidChart: FC<CovidChartProps> = ({
   if (!data || data.length === 0) return <div>Ничего не найдено</div>;
 
   // Show roughly up to ~8 ticks to avoid label clutter.
-  const tickInterval = Math.max(0, Math.floor(data.length / 8));
+  const tickInterval = Math.max(0, Math.ceil(data.length / 8) - 1);
 
   return (
     <ResponsiveContainer width="100%" height={height}>
@@ -43,6 +43,19 @@ const CovidChart: FC<CovidChartProps> = ({
         <XAxis
           dataKey="date"
           interval={tickInterval}
+          // Reduce tick density + format as YYYY-MM + rotate slightly so date labels don't overlap.
+          tickFormatter={(value) => {
+            const raw =
+              typeof value === "string"
+                ? value
+                : value instanceof Date
+                  ? value.toISOString().slice(0, 10)
+                  : String(value);
+            return raw.slice(0, 7); // YYYY-MM
+          }}
+          angle={-45}
+          textAnchor="end"
+          height={60}
           tick={{ fontSize: 12 }}
           tickMargin={8}
         />
