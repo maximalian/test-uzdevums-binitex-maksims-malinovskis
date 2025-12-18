@@ -36,17 +36,11 @@ const FieldRangeFilter: FC<FieldRangeFilterProps> = ({
 
   const handleMinChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextValue = event.target.value;
-    const nextIsValid = isValueValid(nextValue);
-    // DEBUG remove later: verify entered value + validation
-    console.log("FieldRangeFilter min changed:", { value: nextValue, isValid: nextIsValid });
     onChangeMin(nextValue);
   };
 
   const handleMaxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextValue = event.target.value;
-    const nextIsValid = isValueValid(nextValue);
-    // DEBUG remove later: verify entered value + validation
-    console.log("FieldRangeFilter max changed:", { value: nextValue, isValid: nextIsValid });
     onChangeMax(nextValue);
   };
 

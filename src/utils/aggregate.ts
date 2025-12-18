@@ -189,6 +189,5 @@ export function debugAggregateSample(): void {
     },
   };
 
-  const aggregated = aggregateByCountry(sampleRecords, filters);
-  console.log("Sample aggregation:", aggregated);
+  aggregateByCountry(sampleRecords, filters);
 }

@@ -1,5 +1,5 @@
 import type { ChangeEvent, FC } from "react";
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 
 type DateRangeFilterProps = {
   from: Date;
@@ -54,39 +54,15 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
   const isFromInvalid = from.getTime() < minDate.getTime() || from.getTime() > maxDate.getTime();
   const isToInvalid = to.getTime() < minDate.getTime() || to.getTime() > maxDate.getTime();
 
-  // Limiting `min`/`max` is important: it prevents selecting dates outside the dataset range
-  // and avoids confusing "no data" states without changing any business logic.
-  useEffect(() => {
-    // DEBUG remove later: verify API-provided dataset bounds
-    console.log("DateRangeFilter bounds (min/max):", { minValue, maxValue });
-  }, [minValue, maxValue]);
-
-  useEffect(() => {
-    // DEBUG remove later: verify current values vs bounds
-    console.debug("DateRangeFilter dates (from/to/min/max):", {
-      from,
-      to,
-      minDate,
-      maxDate,
-      isCustomRange,
-      isFromInvalid,
-      isToInvalid,
-    });
-  }, [from, to, minDate, maxDate, isCustomRange, isFromInvalid, isToInvalid]);
-
   // Handle "from" date changes and propagate to parent with parsed Date
   const handleFromChange = (event: ChangeEvent<HTMLInputElement>) => {
     const parsed = parseDateInputValue(event.target.value);
-    // DEBUG: log that the "from" date changed
-    console.log("DateRangeFilter from changed:", parsed);
     onChangeFrom(parsed);
   };
 
   // Handle "to" date changes and propagate to parent with parsed Date
   const handleToChange = (event: ChangeEvent<HTMLInputElement>) => {
     const parsed = parseDateInputValue(event.target.value);
-    // DEBUG: log that the "to" date changed
-    console.log("DateRangeFilter to changed:", parsed);
     onChangeTo(parsed);
   };
 

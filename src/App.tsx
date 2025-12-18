@@ -68,10 +68,6 @@ function App() {
         // default filters: set range to full data span on first load
         setFrom(min);
         setTo(max);
-
-        // DEBUG: verify data arrival
-        console.log("[App] Loaded records:", incoming.length);
-        console.log("[App] Date bounds:", { min, max });
       } catch (err) {
         console.error("Data load failed:", err);
         setRecords([]);
@@ -85,56 +81,39 @@ function App() {
   }, []);
 
   const handleChangeView = useCallback((next: ViewValue) => {
-    // DEBUG remove later: log view changes
-    console.log("App view changed:", next);
     setView(next);
   }, []);
 
   const handleChangeFrom = useCallback((next: Date) => {
-    // DEBUG remove later: log date changes
-    console.log("App from date changed:", next);
     setFrom(next);
   }, []);
 
   const handleChangeTo = useCallback((next: Date) => {
-    // DEBUG remove later: log date changes
-    console.log("App to date changed:", next);
     setTo(next);
   }, []);
 
   const handleCountryChange = useCallback((next: string) => {
-    // DEBUG remove later: log country search input
-    console.log("App countryQuery changed:", next);
     setCountryQuery(next);
   }, []);
 
   const handleFieldChange = useCallback((next: NumericFilterField) => {
-    // DEBUG remove later: log field change
-    console.log("App field changed:", next);
     setField(next);
   }, []);
 
   const handleMinValueChange = useCallback((next: string) => {
-    // DEBUG remove later: log min value change
-    console.log("App minValue changed:", next);
     setMinValue(next);
   }, []);
 
   const handleMaxValueChange = useCallback((next: string) => {
-    // DEBUG remove later: log max value change
-    console.log("App maxValue changed:", next);
     setMaxValue(next);
   }, []);
 
   const handleSelectedCountryChange = useCallback((next: string) => {
-    // DEBUG: track selected country for chart view
-    console.log("App selectedCountry changed:", next);
     setSelectedCountry(next);
   }, []);
 
   const handleReset = useCallback(() => {
     // Reset all filters back to defaults (date range + field filters)
-    console.log("App reset triggered"); // DEBUG remove later
     setCountryQuery("");
     setField("cases");
     setMinValue("");
@@ -181,19 +160,6 @@ function App() {
     if (!records.length || !filters) return [];
     return buildTimeSeries(records, filters, selectedCountry === "" ? null : selectedCountry);
   }, [filters, records, selectedCountry]);
-
-  // DEBUG logs: track filter changes and resulting row count.
-  useEffect(() => {
-    console.debug("[App] Filters updated:", filters);
-  }, [filters]);
-
-  useEffect(() => {
-    console.debug("[App] Rows recomputed:", rows.length);
-  }, [rows]);
-
-  useEffect(() => {
-    console.debug("[App] Chart data recomputed:", chartData.length);
-  }, [chartData]);
 
   // Loading/Error UI is extracted into separate components for reusability and a cleaner App.tsx.
   const showLoading = loading || (!error && !datesReady);

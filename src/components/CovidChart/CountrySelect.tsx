@@ -11,11 +11,6 @@ const CountrySelect: FC<CountrySelectProps> = ({ countries, value, onChange }) =
   // Keep dropdown options sorted without mutating the incoming prop.
   const sortedCountries = useMemo(() => [...countries].sort((a, b) => a.localeCompare(b)), [countries]);
 
-  // DEBUG: trace currently selected value on each render.
-  if (import.meta.env?.DEV) {
-    console.debug("[CountrySelect] value", value);
-  }
-
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     onChange(event.target.value);
   };

@@ -11,8 +11,6 @@ const CountrySearch: FC<CountrySearchProps> = ({ value, onChange }) => {
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const nextValue = event.target.value;
-      // DEBUG remove later: track user input to verify onChange wiring
-      console.log("CountrySearch value changed:", nextValue);
       onChange(nextValue);
     },
     [onChange]

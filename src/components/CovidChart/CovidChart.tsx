@@ -24,11 +24,6 @@ const CovidChart: FC<CovidChartProps> = ({
   error,
   height = 400,
 }) => {
-  // DEBUG: log a small slice and total length every render to trace inputs.
-  if (import.meta.env?.DEV) {
-    console.debug("[CovidChart] sample", data.slice(0, 5), "len", data.length);
-  }
-
   if (loading) return <div>Loading chart...</div>;
   if (error) return <div>{error}</div>;
   if (!data || data.length === 0) return <div>Ничего не найдено</div>;

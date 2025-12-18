@@ -9,8 +9,6 @@ const ResetButton: FC<ResetButtonProps> = ({ onReset, disabled = false }) => {
   // Button to reset filters back to their default values
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    // DEBUG remove later: confirm reset wiring
-    console.log("Reset clicked");
     onReset();
   };
 

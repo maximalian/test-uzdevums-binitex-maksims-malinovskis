@@ -23,8 +23,6 @@ const ViewTabs: FC<ViewTabsProps> = ({ value, onChange }) => {
       (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
         if (next === value) return;
-        // DEBUG remove later: log view switch
-        console.log("ViewTabs changed:", next);
         onChange(next);
       },
     [onChange, value]

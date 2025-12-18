@@ -43,14 +43,6 @@ export function buildTimeSeries(
     }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
-  if (import.meta.env?.DEV) {
-    console.debug("[buildTimeSeries] counts", {
-      afterDateFilter: filteredByDate.length,
-      afterCountryFilter: filteredByCountry.length,
-      points: series.length,
-    });
-  }
-
   return series;
 }
 
@@ -113,9 +105,6 @@ export function debugBuildSeriesSample(): void {
     },
   };
 
-  const allCountries = buildTimeSeries(sampleRecords, filters, null);
-  const onlySpain = buildTimeSeries(sampleRecords, filters, "Spain");
-
-  console.log("[debugBuildSeriesSample] all countries:", allCountries);
-  console.log("[debugBuildSeriesSample] Spain only:", onlySpain);
+  buildTimeSeries(sampleRecords, filters, null);
+  buildTimeSeries(sampleRecords, filters, "Spain");
 }
