@@ -9,6 +9,8 @@ type MutableCountryAggregate = {
   deathsInPeriod: number;
   casesTotalAllTime: number;
   deathsTotalAllTime: number;
+  dailyCases: Map<string, number>;
+  dailyDeaths: Map<string, number>;
 };
 
 const safePopulation = (popData2019: number | null): number =>
@@ -39,6 +41,8 @@ export function aggregateByCountry(records: CovidRecord[], filters: AggregationF
         deathsInPeriod: 0,
         casesTotalAllTime: 0,
         deathsTotalAllTime: 0,
+        dailyCases: new Map(),
+        dailyDeaths: new Map(),
       });
     }
 
@@ -48,28 +52,47 @@ export function aggregateByCountry(records: CovidRecord[], filters: AggregationF
     bucket.casesTotalAllTime += record.cases;
     bucket.deathsTotalAllTime += record.deaths;
 
-    // period sums
+    // period sums; group by day so we can derive per-day metrics (avg/max) later without touching UI.
     const recordDate = parseApiDate(record.dateRep);
+    // Use dateRange to keep calculations constrained to the user-selected window.
     if (isDateInRange(recordDate, filters.dateRange.from, filters.dateRange.to)) {
+      const dayKey = recordDate.toISOString().slice(0, 10); // YYYY-MM-DD
       bucket.casesInPeriod += record.cases;
       bucket.deathsInPeriod += record.deaths;
+      bucket.dailyCases.set(dayKey, (bucket.dailyCases.get(dayKey) ?? 0) + record.cases);
+      bucket.dailyDeaths.set(dayKey, (bucket.dailyDeaths.get(dayKey) ?? 0) + record.deaths);
     }
   }
 
   // map to final rows with /1000 metrics
-  let rows: CountryRow[] = Array.from(aggregates.values()).map((agg) => ({
-    country: agg.country,
-    casesInPeriod: agg.casesInPeriod,
-    deathsInPeriod: agg.deathsInPeriod,
-    casesTotalAllTime: agg.casesTotalAllTime,
-    deathsTotalAllTime: agg.deathsTotalAllTime,
-    population: agg.population,
-    // /1000 metrics
-    casesPer1000: calcPerThousand(agg.casesInPeriod, agg.population),
-    deathsPer1000: calcPerThousand(agg.deathsInPeriod, agg.population),
-  }));
+  let rows: CountryRow[] = Array.from(aggregates.values()).map((agg) => {
+    const dayKeys = new Set([...agg.dailyCases.keys(), ...agg.dailyDeaths.keys()]);
+    const sortedDays = Array.from(dayKeys).sort();
+    const casesPerDay = sortedDays.map((day) => agg.dailyCases.get(day) ?? 0);
+    const deathsPerDay = sortedDays.map((day) => agg.dailyDeaths.get(day) ?? 0);
+    const daysCount = dayKeys.size;
 
-  const rowsBeforeFilters = rows.length;
+    // Average per unique day (not per raw records) to avoid over-weighting days with multiple entries.
+    const avgCasesPerDay = daysCount > 0 ? agg.casesInPeriod / daysCount : 0;
+    const avgDeathsPerDay = daysCount > 0 ? agg.deathsInPeriod / daysCount : 0;
+    const maxCasesPerDay = daysCount > 0 ? Math.max(...casesPerDay) : 0;
+    const maxDeathsPerDay = daysCount > 0 ? Math.max(...deathsPerDay) : 0;
+
+    return {
+      country: agg.country,
+      casesInPeriod: agg.casesInPeriod,
+      deathsInPeriod: agg.deathsInPeriod,
+      casesTotalAllTime: agg.casesTotalAllTime,
+      deathsTotalAllTime: agg.deathsTotalAllTime,
+      population: agg.population,
+      casesPer1000: calcPerThousand(agg.casesInPeriod, agg.population),
+      deathsPer1000: calcPerThousand(agg.deathsInPeriod, agg.population),
+      avgCasesPerDay,
+      avgDeathsPerDay,
+      maxCasesPerDay,
+      maxDeathsPerDay,
+    };
+  });
 
   // filtering: country (case-insensitive substring)
   const countryQuery = filters.countryQuery.trim();
@@ -77,8 +100,6 @@ export function aggregateByCountry(records: CovidRecord[], filters: AggregationF
     const q = countryQuery.toLowerCase();
     rows = rows.filter((row) => row.country.toLowerCase().includes(q));
   }
-
-  const rowsAfterCountryFilter = rows.length;
 
   // filtering: numeric field min/max (empty strings mean "no bound"; NaN is ignored)
   const { field, min, max } = filters.numericFilter;
@@ -100,17 +121,6 @@ export function aggregateByCountry(records: CovidRecord[], filters: AggregationF
       if (hasValidMin && value < (minValue as number)) return false;
       if (hasValidMax && value > (maxValue as number)) return false;
       return true;
-    });
-  }
-
-  const rowsAfterNumericFilter = rows.length;
-
-  // DEBUG-only counts to trace filtering (easy to remove)
-  if (import.meta.env?.DEV) {
-    console.debug("[aggregateByCountry] rows", {
-      beforeFilters: rowsBeforeFilters,
-      afterCountry: rowsAfterCountryFilter,
-      afterNumeric: rowsAfterNumericFilter,
     });
   }
 

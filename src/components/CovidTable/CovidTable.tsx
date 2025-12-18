@@ -100,7 +100,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 style={{ zIndex: 1 }}
                 onClick={() => handleHeaderClick("country")}
               >
-                Страна {sortField === "country" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+                Страна {sortField === "country" ? (sortDirection === "asc" ? "" : "") : ""}
               </th>
               <th
                 scope="col"
@@ -110,7 +110,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
               >
                 {/* WHY `text-end`: numbers align by digits and are easier to scan vertically. */}
                 Cases (за период){" "}
-                {sortField === "casesInPeriod" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+                {sortField === "casesInPeriod" ? (sortDirection === "asc" ? "" : "") : ""}
               </th>
               <th
                 scope="col"
@@ -119,7 +119,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 onClick={() => handleHeaderClick("deathsInPeriod")}
               >
                 Deaths (за период){" "}
-                {sortField === "deathsInPeriod" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+                {sortField === "deathsInPeriod" ? (sortDirection === "asc" ? "" : "") : ""}
               </th>
               <th
                 scope="col"
@@ -128,7 +128,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 onClick={() => handleHeaderClick("casesTotalAllTime")}
               >
                 Cases Total (всё время){" "}
-                {sortField === "casesTotalAllTime" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+                {sortField === "casesTotalAllTime" ? (sortDirection === "asc" ? "" : "") : ""}
               </th>
               <th
                 scope="col"
@@ -139,8 +139,8 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 Deaths Total (всё время){" "}
                 {sortField === "deathsTotalAllTime"
                   ? sortDirection === "asc"
-                    ? "▲"
-                    : "▼"
+                    ? ""
+                    : ""
                   : ""}
               </th>
               <th
@@ -150,7 +150,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 onClick={() => handleHeaderClick("casesPer1000")}
               >
                 Cases per 1000{" "}
-                {sortField === "casesPer1000" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+                {sortField === "casesPer1000" ? (sortDirection === "asc" ? "" : "") : ""}
               </th>
               <th
                 scope="col"
@@ -159,7 +159,44 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 onClick={() => handleHeaderClick("deathsPer1000")}
               >
                 Deaths per 1000{" "}
-                {sortField === "deathsPer1000" ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+                {sortField === "deathsPer1000" ? (sortDirection === "asc" ? "" : "") : ""}
+              </th>
+              {/* Optional daily aggregates, scoped to the selected date range. */}
+              <th
+                scope="col"
+                className={`${stickyThClass} text-end text-nowrap`}
+                style={{ zIndex: 1 }}
+                onClick={() => handleHeaderClick("avgCasesPerDay")}
+              >
+                Avg Cases / Day{" "}
+                {sortField === "avgCasesPerDay" ? (sortDirection === "asc" ? "" : "") : ""}
+              </th>
+              <th
+                scope="col"
+                className={`${stickyThClass} text-end text-nowrap`}
+                style={{ zIndex: 1 }}
+                onClick={() => handleHeaderClick("avgDeathsPerDay")}
+              >
+                Avg Deaths / Day{" "}
+                {sortField === "avgDeathsPerDay" ? (sortDirection === "asc" ? "" : "") : ""}
+              </th>
+              <th
+                scope="col"
+                className={`${stickyThClass} text-end text-nowrap`}
+                style={{ zIndex: 1 }}
+                onClick={() => handleHeaderClick("maxCasesPerDay")}
+              >
+                Max Cases / Day{" "}
+                {sortField === "maxCasesPerDay" ? (sortDirection === "asc" ? "" : "") : ""}
+              </th>
+              <th
+                scope="col"
+                className={`${stickyThClass} text-end text-nowrap`}
+                style={{ zIndex: 1 }}
+                onClick={() => handleHeaderClick("maxDeathsPerDay")}
+              >
+                Max Deaths / Day{" "}
+                {sortField === "maxDeathsPerDay" ? (sortDirection === "asc" ? "" : "") : ""}
               </th>
             </tr>
           </thead>
@@ -173,6 +210,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 <td className="text-end">{row.deathsTotalAllTime.toLocaleString("en-US")}</td>
                 <td className="text-end">{row.casesPer1000.toFixed(2)}</td>
                 <td className="text-end">{row.deathsPer1000.toFixed(2)}</td>
+                <td className="text-end">{row.avgCasesPerDay.toFixed(2)}</td>
+                <td className="text-end">{row.avgDeathsPerDay.toFixed(2)}</td>
+                <td className="text-end">{row.maxCasesPerDay.toLocaleString("en-US")}</td>
+                <td className="text-end">{row.maxDeathsPerDay.toLocaleString("en-US")}</td>
               </tr>
             ))}
           </tbody>

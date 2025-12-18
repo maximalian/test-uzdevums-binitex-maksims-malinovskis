@@ -7,6 +7,11 @@ export type CountryRow = {
   deathsTotalAllTime: number; // Unfiltered cumulative deaths.
   casesPer1000: number;
   deathsPer1000: number;
+  // Daily aggregates calculated only for the selected dateRange.
+  avgCasesPerDay: number;
+  avgDeathsPerDay: number;
+  maxCasesPerDay: number;
+  maxDeathsPerDay: number;
   population: number; // Raw population to enable per-1k calculations.
 };
 
