@@ -46,7 +46,7 @@ const FieldRangeFilter: FC<FieldRangeFilterProps> = ({
 
   return (
     <div className="d-flex flex-wrap gap-3 align-items-end">
-      <label className="d-flex flex-column" style={{ minWidth: 220 }}>
+      <label className="d-flex flex-column filter-w-220">
         <span className="form-label mb-1">Фильтровать по полю</span>
         <select value={field} onChange={handleFieldChange} className="form-select">
           <option value="cases">cases</option>
@@ -56,7 +56,7 @@ const FieldRangeFilter: FC<FieldRangeFilterProps> = ({
         </select>
       </label>
 
-      <label className="d-flex flex-column" style={{ minWidth: 140 }}>
+      <label className="d-flex flex-column filter-w-140">
         <span className="form-label mb-1">значение от</span>
         <input
           type="text"
@@ -67,7 +67,7 @@ const FieldRangeFilter: FC<FieldRangeFilterProps> = ({
         <div className="invalid-feedback">Введите числовое значение</div>
       </label>
 
-      <label className="d-flex flex-column" style={{ minWidth: 140 }}>
+      <label className="d-flex flex-column filter-w-140">
         <span className="form-label mb-1">значение до</span>
         <input
           type="text"

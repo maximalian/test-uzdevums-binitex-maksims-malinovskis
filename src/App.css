@@ -1,42 +1,33 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Responsive helpers for filter controls: keep desktop widths, relax on mobile. */
+.filter-w-220 {
+  min-width: 220px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.filter-w-180 {
+  min-width: 180px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.filter-w-140 {
+  min-width: 140px;
+}
+
+@media (max-width: 767.98px) {
+  .filter-w-220,
+  .filter-w-180,
+  .filter-w-140 {
+    min-width: 0;
+    width: 100%;
   }
-  to {
-    transform: rotate(360deg);
+
+  /* Stack filters vertically with comfy spacing on small screens. */
+  .filters-row {
+    flex-direction: column;
+    gap: 1.25rem;
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  /* Tighten horizontal padding so inputs align with viewport edges (filters + table only). */
+  .filters-panel .card-body,
+  .table-card > .card-body {
+    padding: 0.75rem;
   }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }

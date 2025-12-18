@@ -225,7 +225,7 @@ function App() {
             </div>
 
             {/* Content card */}
-            <div className="card shadow-sm">
+            <div className={`card shadow-sm${view === "table" ? " table-card" : ""}`}>
               <div className="card-body">
                 {view === "table" ? (
                   rows.length === 0 ? (

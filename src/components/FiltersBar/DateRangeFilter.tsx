@@ -1,5 +1,5 @@
 import type { ChangeEvent, FC } from "react";
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 
 type DateRangeFilterProps = {
   from: Date;
@@ -32,9 +32,6 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
   onChangeFrom,
   onChangeTo,
 }) => {
-  const fromInputRef = useRef<HTMLInputElement>(null);
-  const toInputRef = useRef<HTMLInputElement>(null);
-
   const isCustomRange = from !== minDate || to !== maxDate;
 
   // Precompute formatted values to keep JSX tidy and avoid repeated formatting
@@ -74,13 +71,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
 
   return (
     <div className="d-flex flex-wrap gap-3 align-items-end">
-      <label className="d-flex flex-column" style={{ minWidth: 180 }}>
+      <label className="d-flex flex-column filter-w-180">
         <span className="form-label mb-1">Период от</span>
 
-        {/* Calendar icon makes the native date picker more noticeable without changing existing input styles. */}
-        <div className="input-group has-validation">
+        <div className="has-validation">
           <input
-            ref={fromInputRef}
             type="date"
             value={fromValue}
             min={minValue}
@@ -88,36 +83,15 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
             onChange={handleFromChange}
             className={`form-control${isFromInvalid ? " is-invalid" : ""}`}
           />
-          <span
-            className="input-group-text"
-            role="button"
-            tabIndex={0}
-            aria-label="Открыть календарь (дата начала)"
-            onClick={() => {
-              fromInputRef.current?.focus();
-              fromInputRef.current?.showPicker?.();
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                fromInputRef.current?.focus();
-                fromInputRef.current?.showPicker?.();
-              }
-            }}
-          >
-            {"\u{1F4C5}"}
-          </span>
           <div className="invalid-feedback">Дата вне допустимого диапазона</div>
         </div>
       </label>
 
-      <label className="d-flex flex-column" style={{ minWidth: 180 }}>
+      <label className="d-flex flex-column filter-w-180">
         <span className="form-label mb-1">до</span>
 
-        {/* Calendar icon makes the native date picker more noticeable without changing existing input styles. */}
-        <div className="input-group has-validation">
+        <div className="has-validation">
           <input
-            ref={toInputRef}
             type="date"
             value={toValue}
             min={minValue}
@@ -125,30 +99,11 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
             onChange={handleToChange}
             className={`form-control${isToInvalid ? " is-invalid" : ""}`}
           />
-          <span
-            className="input-group-text"
-            role="button"
-            tabIndex={0}
-            aria-label="Открыть календарь (дата окончания)"
-            onClick={() => {
-              toInputRef.current?.focus();
-              toInputRef.current?.showPicker?.();
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                toInputRef.current?.focus();
-                toInputRef.current?.showPicker?.();
-              }
-            }}
-          >
-            {"\u{1F4C5}"}
-          </span>
           <div className="invalid-feedback">Дата вне допустимого диапазона</div>
         </div>
       </label>
 
-      <div className="d-flex flex-column" style={{ minWidth: 180 }}>
+      <div className="d-flex flex-column filter-w-180">
         <span className="form-label mb-1">&nbsp;</span>
         {isCustomRange && (
           <>

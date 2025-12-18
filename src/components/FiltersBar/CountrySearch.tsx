@@ -17,7 +17,7 @@ const CountrySearch: FC<CountrySearchProps> = ({ value, onChange }) => {
   );
 
   return (
-    <label className="d-flex flex-column" style={{ minWidth: 220 }}>
+    <label className="d-flex flex-column filter-w-220">
       <span className="form-label mb-1">Поиск страны</span>
       <input
         type="text"

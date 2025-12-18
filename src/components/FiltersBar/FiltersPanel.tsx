@@ -7,7 +7,7 @@ type FiltersPanelProps = {
 
 export default function FiltersPanel({ title = "Filters", children }: FiltersPanelProps) {
   return (
-    <div className="card shadow-sm">
+    <div className="card shadow-sm filters-panel">
       <div className="card-body">
         {/* WHY: reusable wrapper to keep a single consistent Bootstrap look for all filter blocks. */}
         <div className="mb-3">
@@ -16,7 +16,7 @@ export default function FiltersPanel({ title = "Filters", children }: FiltersPan
           <small className="text-muted">Adjust filters to narrow down results</small>
         </div>
 
-        <div className="d-flex flex-wrap gap-3 align-items-end">{children}</div>
+        <div className="d-flex flex-wrap gap-3 align-items-end filters-row">{children}</div>
       </div>
     </div>
   );
