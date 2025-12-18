@@ -68,6 +68,19 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
     return 0;
   });
 
+  // Visual-only helper: show aligned sort arrows; sorting logic/state left untouched.
+  const renderSortIndicator = (field: keyof CountryRow) => {
+    if (sortField !== field) {
+      return <span className="small" aria-hidden="true" style={{ minWidth: "1em" }} />;
+    }
+
+    return (
+      <span className="small" aria-hidden="true" style={{ minWidth: "1em" }}>
+        {sortDirection === "asc" ? "▲" : "▼"}
+      </span>
+    );
+  };
+
   // Pagination: compute slice boundaries and render only the visible portion
   const totalPages = Math.max(1, Math.ceil(sortedData.length / pageSize));
   const safePage = Math.min(currentPage, totalPages - 1);
@@ -100,7 +113,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 style={{ zIndex: 1 }}
                 onClick={() => handleHeaderClick("country")}
               >
-                Страна {sortField === "country" ? (sortDirection === "asc" ? "" : "") : ""}
+                <span className="d-inline-flex align-items-center gap-1">
+                  <span>Страна</span>
+                  {renderSortIndicator("country")}
+                </span>
               </th>
               <th
                 scope="col"
@@ -109,8 +125,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 onClick={() => handleHeaderClick("casesInPeriod")}
               >
                 {/* WHY `text-end`: numbers align by digits and are easier to scan vertically. */}
-                Cases (за период){" "}
-                {sortField === "casesInPeriod" ? (sortDirection === "asc" ? "" : "") : ""}
+                <span className="d-inline-flex align-items-center gap-1">
+                  <span>Cases (за период)</span>
+                  {renderSortIndicator("casesInPeriod")}
+                </span>
               </th>
               <th
                 scope="col"
@@ -118,8 +136,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 style={{ zIndex: 1 }}
                 onClick={() => handleHeaderClick("deathsInPeriod")}
               >
-                Deaths (за период){" "}
-                {sortField === "deathsInPeriod" ? (sortDirection === "asc" ? "" : "") : ""}
+                <span className="d-inline-flex align-items-center gap-1">
+                  <span>Deaths (за период)</span>
+                  {renderSortIndicator("deathsInPeriod")}
+                </span>
               </th>
               <th
                 scope="col"
@@ -127,8 +147,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 style={{ zIndex: 1 }}
                 onClick={() => handleHeaderClick("casesTotalAllTime")}
               >
-                Cases Total (всё время){" "}
-                {sortField === "casesTotalAllTime" ? (sortDirection === "asc" ? "" : "") : ""}
+                <span className="d-inline-flex align-items-center gap-1">
+                  <span>Cases Total (всё время)</span>
+                  {renderSortIndicator("casesTotalAllTime")}
+                </span>
               </th>
               <th
                 scope="col"
@@ -136,12 +158,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 style={{ zIndex: 1 }}
                 onClick={() => handleHeaderClick("deathsTotalAllTime")}
               >
-                Deaths Total (всё время){" "}
-                {sortField === "deathsTotalAllTime"
-                  ? sortDirection === "asc"
-                    ? ""
-                    : ""
-                  : ""}
+                <span className="d-inline-flex align-items-center gap-1">
+                  <span>Deaths Total (всё время)</span>
+                  {renderSortIndicator("deathsTotalAllTime")}
+                </span>
               </th>
               <th
                 scope="col"
@@ -149,8 +169,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 style={{ zIndex: 1 }}
                 onClick={() => handleHeaderClick("casesPer1000")}
               >
-                Cases per 1000{" "}
-                {sortField === "casesPer1000" ? (sortDirection === "asc" ? "" : "") : ""}
+                <span className="d-inline-flex align-items-center gap-1">
+                  <span>Cases per 1000</span>
+                  {renderSortIndicator("casesPer1000")}
+                </span>
               </th>
               <th
                 scope="col"
@@ -158,8 +180,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 style={{ zIndex: 1 }}
                 onClick={() => handleHeaderClick("deathsPer1000")}
               >
-                Deaths per 1000{" "}
-                {sortField === "deathsPer1000" ? (sortDirection === "asc" ? "" : "") : ""}
+                <span className="d-inline-flex align-items-center gap-1">
+                  <span>Deaths per 1000</span>
+                  {renderSortIndicator("deathsPer1000")}
+                </span>
               </th>
               {/* Optional daily aggregates, scoped to the selected date range. */}
               <th
@@ -168,8 +192,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 style={{ zIndex: 1 }}
                 onClick={() => handleHeaderClick("avgCasesPerDay")}
               >
-                Avg Cases / Day{" "}
-                {sortField === "avgCasesPerDay" ? (sortDirection === "asc" ? "" : "") : ""}
+                <span className="d-inline-flex align-items-center gap-1">
+                  <span>Avg Cases / Day</span>
+                  {renderSortIndicator("avgCasesPerDay")}
+                </span>
               </th>
               <th
                 scope="col"
@@ -177,8 +203,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 style={{ zIndex: 1 }}
                 onClick={() => handleHeaderClick("avgDeathsPerDay")}
               >
-                Avg Deaths / Day{" "}
-                {sortField === "avgDeathsPerDay" ? (sortDirection === "asc" ? "" : "") : ""}
+                <span className="d-inline-flex align-items-center gap-1">
+                  <span>Avg Deaths / Day</span>
+                  {renderSortIndicator("avgDeathsPerDay")}
+                </span>
               </th>
               <th
                 scope="col"
@@ -186,8 +214,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 style={{ zIndex: 1 }}
                 onClick={() => handleHeaderClick("maxCasesPerDay")}
               >
-                Max Cases / Day{" "}
-                {sortField === "maxCasesPerDay" ? (sortDirection === "asc" ? "" : "") : ""}
+                <span className="d-inline-flex align-items-center gap-1">
+                  <span>Max Cases / Day</span>
+                  {renderSortIndicator("maxCasesPerDay")}
+                </span>
               </th>
               <th
                 scope="col"
@@ -195,8 +225,10 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 style={{ zIndex: 1 }}
                 onClick={() => handleHeaderClick("maxDeathsPerDay")}
               >
-                Max Deaths / Day{" "}
-                {sortField === "maxDeathsPerDay" ? (sortDirection === "asc" ? "" : "") : ""}
+                <span className="d-inline-flex align-items-center gap-1">
+                  <span>Max Deaths / Day</span>
+                  {renderSortIndicator("maxDeathsPerDay")}
+                </span>
               </th>
             </tr>
           </thead>

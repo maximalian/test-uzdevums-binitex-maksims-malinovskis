@@ -116,7 +116,6 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
             className="input-group-text"
             role="button"
             tabIndex={0}
-            style={{ cursor: "pointer" }}
             aria-label="Открыть календарь (дата начала)"
             onClick={() => {
               fromInputRef.current?.focus();
@@ -154,7 +153,6 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
             className="input-group-text"
             role="button"
             tabIndex={0}
-            style={{ cursor: "pointer" }}
             aria-label="Открыть календарь (дата окончания)"
             onClick={() => {
               toInputRef.current?.focus();

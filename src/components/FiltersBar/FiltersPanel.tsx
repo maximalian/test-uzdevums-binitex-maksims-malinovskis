@@ -21,4 +21,3 @@ export default function FiltersPanel({ title = "Filters", children }: FiltersPan
     </div>
   );
 }
-
