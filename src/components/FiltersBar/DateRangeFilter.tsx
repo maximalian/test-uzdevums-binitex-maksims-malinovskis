@@ -12,16 +12,16 @@ type DateRangeFilterProps = {
 
 // Format a Date object into the YYYY-MM-DD string that <input type="date" /> expects.
 const formatDateInputValue = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
 // Parse the YYYY-MM-DD value from the input into a Date (start of day).
 const parseDateInputValue = (value: string): Date => {
-  // Using T00:00:00 keeps the date consistent regardless of timezone offsets.
-  return new Date(`${value}T00:00:00`);
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(Date.UTC(year, (month ?? 1) - 1, day ?? 1));
 };
 
 const DateRangeFilter: FC<DateRangeFilterProps> = ({
@@ -32,7 +32,10 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
   onChangeFrom,
   onChangeTo,
 }) => {
-  const isCustomRange = from !== minDate || to !== maxDate;
+  const isCustomRange =
+    from.getTime() !== minDate.getTime() || to.getTime() !== maxDate.getTime();
+
+  const dateOnly = (d: Date) => Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
 
   // Precompute formatted values to keep JSX tidy and avoid repeated formatting.
   const { fromValue, toValue, minValue, maxValue } = useMemo(
@@ -48,8 +51,8 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
   // Visual-only validation:
   // We do not clamp or block input because users can still type dates manually, and we must not
   // fight the native <input type="date"> UX; instead we highlight out-of-range values.
-  const isFromInvalid = from.getTime() < minDate.getTime() || from.getTime() > maxDate.getTime();
-  const isToInvalid = to.getTime() < minDate.getTime() || to.getTime() > maxDate.getTime();
+  const isFromInvalid = dateOnly(from) < dateOnly(minDate) || dateOnly(from) > dateOnly(maxDate);
+  const isToInvalid = dateOnly(to) < dateOnly(minDate) || dateOnly(to) > dateOnly(maxDate);
 
   // Handle "from" date changes and propagate to the parent with the parsed Date.
   const handleFromChange = (event: ChangeEvent<HTMLInputElement>) => {
