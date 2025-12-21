@@ -235,7 +235,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
           <tbody>
             {visibleRows.map((row) => (
               <tr key={row.country}>
-                <td className="text-start">{row.country}</td>
+                <td className="text-start">{row.country.replaceAll("_", " ")}</td>
                 <td className="text-end">{row.casesInPeriod.toLocaleString("en-US")}</td>
                 <td className="text-end">{row.deathsInPeriod.toLocaleString("en-US")}</td>
                 <td className="text-end">{row.casesTotalAllTime.toLocaleString("en-US")}</td>

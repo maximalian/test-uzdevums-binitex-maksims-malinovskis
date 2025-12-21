@@ -7,9 +7,14 @@ type CountrySelectProps = {
   onChange: (value: string) => void;
 };
 
+const formatCountryLabel = (name: string) => name.replaceAll("_", " ");
+
 const CountrySelect: FC<CountrySelectProps> = ({ countries, value, onChange }) => {
   // Keep dropdown options sorted without mutating the incoming prop.
-  const sortedCountries = useMemo(() => [...countries].sort((a, b) => a.localeCompare(b)), [countries]);
+  const sortedCountries = useMemo(
+    () => [...countries].sort((a, b) => formatCountryLabel(a).localeCompare(formatCountryLabel(b))),
+    [countries]
+  );
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     onChange(event.target.value);
@@ -27,7 +32,7 @@ const CountrySelect: FC<CountrySelectProps> = ({ countries, value, onChange }) =
         <option value="">All countries</option>
         {sortedCountries.map((country) => (
           <option key={country} value={country}>
-            {country}
+            {formatCountryLabel(country)}
           </option>
         ))}
       </select>
