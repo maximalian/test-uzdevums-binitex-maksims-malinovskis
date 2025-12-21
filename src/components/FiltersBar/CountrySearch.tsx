@@ -18,12 +18,12 @@ const CountrySearch: FC<CountrySearchProps> = ({ value, onChange }) => {
 
   return (
     <label className="d-flex flex-column filter-w-220">
-      <span className="form-label mb-1">Поиск страны</span>
+      <span className="form-label mb-1">Country search</span>
       <input
         type="text"
         value={value}
         onChange={handleChange}
-        placeholder="Введите страну..."
+        placeholder="Enter a country..."
         className="form-control"
         // Controlled input that will later feed into table and chart filtering.
       />

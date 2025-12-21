@@ -114,7 +114,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 onClick={() => handleHeaderClick("country")}
               >
                 <span className="d-inline-flex align-items-center gap-1">
-                  <span>Страна</span>
+                  <span>Country</span>
                   {renderSortIndicator("country")}
                 </span>
               </th>
@@ -126,7 +126,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
               >
                 {/* WHY `text-end`: numbers align by digits and are easier to scan vertically. */}
                 <span className="d-inline-flex align-items-center gap-1">
-                  <span>Cases (за период)</span>
+                  <span>Cases (in period)</span>
                   {renderSortIndicator("casesInPeriod")}
                 </span>
               </th>
@@ -137,7 +137,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 onClick={() => handleHeaderClick("deathsInPeriod")}
               >
                 <span className="d-inline-flex align-items-center gap-1">
-                  <span>Deaths (за период)</span>
+                  <span>Deaths (in period)</span>
                   {renderSortIndicator("deathsInPeriod")}
                 </span>
               </th>
@@ -148,7 +148,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 onClick={() => handleHeaderClick("casesTotalAllTime")}
               >
                 <span className="d-inline-flex align-items-center gap-1">
-                  <span>Cases Total (всё время)</span>
+                  <span>Total Cases (all time)</span>
                   {renderSortIndicator("casesTotalAllTime")}
                 </span>
               </th>
@@ -159,7 +159,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                 onClick={() => handleHeaderClick("deathsTotalAllTime")}
               >
                 <span className="d-inline-flex align-items-center gap-1">
-                  <span>Deaths Total (всё время)</span>
+                  <span>Total Deaths (all time)</span>
                   {renderSortIndicator("deathsTotalAllTime")}
                 </span>
               </th>
@@ -256,7 +256,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
       <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
         <div className="d-flex align-items-center gap-2">
           <label htmlFor="covidTablePageSize" className="form-label small text-muted mb-0">
-            Строк на странице
+            Rows per page
           </label>
           <select
             id="covidTablePageSize"

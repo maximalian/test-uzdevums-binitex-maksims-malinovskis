@@ -20,7 +20,7 @@ const ResetButton: FC<ResetButtonProps> = ({ onReset, disabled = false }) => {
       className="btn btn-outline-secondary"
       // `btn-outline-secondary` is noticeable but not "danger" because reset is reversible and not destructive.
     >
-      Сбросить фильтры
+      Reset filters
     </button>
   );
 };

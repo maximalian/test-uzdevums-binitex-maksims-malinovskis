@@ -17,14 +17,14 @@ const CountrySelect: FC<CountrySelectProps> = ({ countries, value, onChange }) =
 
   return (
     <label className="d-flex flex-column" style={{ maxWidth: 320 }}>
-      <span className="form-label mb-1">Страна</span>
+      <span className="form-label mb-1">Country</span>
       <select
         value={value}
         onChange={handleChange}
         className="form-select"
         // Dropdown: the first option uses '' to represent "all countries" so aggregations can include everyone.
       >
-        <option value="">Все страны</option>
+        <option value="">All countries</option>
         {sortedCountries.map((country) => (
           <option key={country} value={country}>
             {country}

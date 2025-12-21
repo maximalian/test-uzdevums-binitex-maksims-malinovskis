@@ -26,7 +26,7 @@ const CovidChart: FC<CovidChartProps> = ({
 }) => {
   if (loading) return <div>Loading chart...</div>;
   if (error) return <div>{error}</div>;
-  if (!data || data.length === 0) return <div>Ничего не найдено</div>;
+  if (!data || data.length === 0) return <div>Nothing found</div>;
 
   // Show roughly up to eight ticks to avoid label clutter.
   const tickInterval = Math.max(0, Math.ceil(data.length / 8) - 1);

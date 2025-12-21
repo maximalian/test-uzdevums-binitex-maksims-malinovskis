@@ -230,7 +230,7 @@ function App() {
                 {view === "table" ? (
                   rows.length === 0 ? (
                     <div className="alert alert-warning mb-0" role="alert">
-                      Ничего не найдено
+                      Nothing found
                     </div>
                   ) : (
                     <>

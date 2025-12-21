@@ -72,7 +72,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
   return (
     <div className="d-flex flex-wrap gap-3 align-items-end">
       <label className="d-flex flex-column filter-w-180">
-        <span className="form-label mb-1">Период от</span>
+        <span className="form-label mb-1">Period from</span>
 
         <div className="has-validation">
           <input
@@ -83,12 +83,12 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
             onChange={handleFromChange}
             className={`form-control${isFromInvalid ? " is-invalid" : ""}`}
           />
-          <div className="invalid-feedback">Дата вне допустимого диапазона</div>
+          <div className="invalid-feedback">Date is out of range</div>
         </div>
       </label>
 
       <label className="d-flex flex-column filter-w-180">
-        <span className="form-label mb-1">до</span>
+        <span className="form-label mb-1">to</span>
 
         <div className="has-validation">
           <input
@@ -99,7 +99,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
             onChange={handleToChange}
             className={`form-control${isToInvalid ? " is-invalid" : ""}`}
           />
-          <div className="invalid-feedback">Дата вне допустимого диапазона</div>
+          <div className="invalid-feedback">Date is out of range</div>
         </div>
       </label>
 
@@ -113,7 +113,7 @@ const DateRangeFilter: FC<DateRangeFilterProps> = ({
               className="btn btn-outline-secondary btn-sm"
               onClick={handleShowAllTime}
             >
-              Показать всё время
+              Show full range
             </button>
           </>
         )}

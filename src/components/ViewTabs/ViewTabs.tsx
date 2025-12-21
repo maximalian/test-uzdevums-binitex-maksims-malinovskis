@@ -12,8 +12,8 @@ const ViewTabs: FC<ViewTabsProps> = ({ value, onChange }) => {
   // List of available view modes; this component toggles between table and chart displays.
   const tabs = useMemo(
     () => [
-      { key: "table" as const, label: "Таблица" },
-      { key: "chart" as const, label: "График" },
+      { key: "table" as const, label: "Table" },
+      { key: "chart" as const, label: "Chart" },
     ],
     []
   );
