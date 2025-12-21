@@ -68,13 +68,13 @@ export function getMinMaxDates(records: Array<{ dateRep: string }>): { min: Date
 }
 
 /*
-Как проверить (быстрые вызовы в консоли):
+Quick checks in a console/devtools session:
 
-  const d = parseApiDate("01/12/2019"); // -> Date for 2019-12-01 UTC
-  isDateInRange(d, parseApiDate("30/11/2019"), parseApiDate("02/12/2019")); // true
+  const d = parseApiDate("01/12/2019"); // -> Date for 2019-12-01 UTC.
+  isDateInRange(d, parseApiDate("30/11/2019"), parseApiDate("02/12/2019")); // true.
   getMinMaxDates([
     { dateRep: "05/01/2020" },
     { dateRep: "01/12/2019" },
     { dateRep: "20/12/2019" },
-  ]); // -> { min: 2019-12-01, max: 2020-01-05 } (Date objects)
+  ]); // -> { min: 2019-12-01, max: 2020-01-05 } (Date objects).
 */

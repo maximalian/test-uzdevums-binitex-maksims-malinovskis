@@ -1,13 +1,13 @@
 import type { FC } from "react";
 import {
-  CartesianGrid, // background gridlines for easier reading
-  Legend, // renders the legend describing each Line
-  Line, // draws a single line series (cases/deaths)
-  LineChart, // main chart container that wires axes + lines together
-  ResponsiveContainer, // makes the chart adapt to parent width/height
-  Tooltip, // hover tooltip showing values for the hovered x-position
-  XAxis, // horizontal axis for dates
-  YAxis, // vertical axis for numeric values
+  CartesianGrid, // Background gridlines for easier reading.
+  Legend, // Renders the legend describing each Line.
+  Line, // Draws a single line series (cases/deaths).
+  LineChart, // Main chart container that wires axes and lines together.
+  ResponsiveContainer, // Makes the chart adapt to parent width and height.
+  Tooltip, // Hover tooltip showing values for the hovered x-position.
+  XAxis, // Horizontal axis for dates.
+  YAxis, // Vertical axis for numeric values.
 } from "recharts";
 import type { ChartPoint } from "../../types/chart";
 
@@ -28,7 +28,7 @@ const CovidChart: FC<CovidChartProps> = ({
   if (error) return <div>{error}</div>;
   if (!data || data.length === 0) return <div>Ничего не найдено</div>;
 
-  // Show roughly up to ~8 ticks to avoid label clutter.
+  // Show roughly up to eight ticks to avoid label clutter.
   const tickInterval = Math.max(0, Math.ceil(data.length / 8) - 1);
 
   return (
@@ -38,7 +38,7 @@ const CovidChart: FC<CovidChartProps> = ({
         <XAxis
           dataKey="date"
           interval={tickInterval}
-          // Reduce tick density + format as YYYY-MM + rotate slightly so date labels don't overlap.
+          // Reduce tick density, format as YYYY-MM, and rotate slightly so date labels do not overlap.
           tickFormatter={(value) => {
             const raw =
               typeof value === "string"
@@ -46,7 +46,7 @@ const CovidChart: FC<CovidChartProps> = ({
                 : value instanceof Date
                   ? value.toISOString().slice(0, 10)
                   : String(value);
-            return raw.slice(0, 7); // YYYY-MM
+            return raw.slice(0, 7); // YYYY-MM.
           }}
           angle={-45}
           textAnchor="end"

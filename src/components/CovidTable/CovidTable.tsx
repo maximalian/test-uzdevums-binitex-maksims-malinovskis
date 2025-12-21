@@ -2,7 +2,7 @@ import type { ChangeEvent, FC } from "react";
 import { useState } from "react";
 import type { CountryRow } from "../../types/stats";
 
-// Props: aggregated country rows that will be shown inside the table
+// Props: aggregated country rows that will be shown inside the table.
 type CovidTableProps = {
   data?: CountryRow[];
 };
@@ -11,17 +11,17 @@ type PageSize = 10 | 20 | 50;
 const PAGE_SIZE_OPTIONS: readonly PageSize[] = [10, 20, 50];
 
 const CovidTable: FC<CovidTableProps> = ({ data }) => {
-  // Sorting state: which column is active and whether it is ascending or descending
+  // Sorting state tracks which column is active and whether it is ascending or descending.
   const [sortField, setSortField] = useState<keyof CountryRow>("country");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-  // Pagination state: current page index (0-based)
+  // Pagination state tracks the current page index (0-based).
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<PageSize>(20);
 
-  // Normalize data: keep hooks unconditional, use an empty array when data is missing
+  // Normalize data: keep hooks unconditional and use an empty array when data is missing.
   const rows = data ?? [];
 
-  // Rendering fallback when there are no rows to display
+  // Rendering fallback when there are no rows to display.
   if (rows.length === 0) {
     // Bootstrap alert keeps the empty state visually consistent inside a card.
     return (
@@ -31,9 +31,9 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
     );
   }
 
-  // Handle clicks on table headers to toggle sort column/direction without mutating props
+  // Handle clicks on table headers to toggle sort column and direction without mutating props.
   const handleHeaderClick = (field: keyof CountryRow) => {
-    // Clicking the same column toggles direction; a new column resets to ascending
+    // Clicking the same column toggles direction; a new column resets to ascending.
     if (field === sortField) {
       setSortDirection((prevDirection) => (prevDirection === "asc" ? "desc" : "asc"));
     } else {
@@ -49,12 +49,12 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
     setCurrentPage(0);
   };
 
-  // Copy the input array to avoid mutating props, then sort based on active column and direction
+  // Copy the input array to avoid mutating props, then sort based on active column and direction.
   const sortedData = [...rows].sort((a, b) => {
     const aValue = a[sortField];
     const bValue = b[sortField];
 
-    // String columns use localeCompare; numeric columns use arithmetic difference
+    // String columns use localeCompare; numeric columns use arithmetic difference.
     if (typeof aValue === "string" && typeof bValue === "string") {
       const result = aValue.localeCompare(bValue);
       return sortDirection === "asc" ? result : -result;
@@ -68,7 +68,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
     return 0;
   });
 
-  // Visual-only helper: show aligned sort arrows; sorting logic/state left untouched.
+  // Visual-only helper: show aligned sort arrows; sorting logic and state stay untouched.
   const renderSortIndicator = (field: keyof CountryRow) => {
     if (sortField !== field) {
       return <span className="small" aria-hidden="true" style={{ minWidth: "1em" }} />;
@@ -81,14 +81,14 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
     );
   };
 
-  // Pagination: compute slice boundaries and render only the visible portion
+  // Pagination: compute slice boundaries and render only the visible portion.
   const totalPages = Math.max(1, Math.ceil(sortedData.length / pageSize));
   const safePage = Math.min(currentPage, totalPages - 1);
   const startIndex = safePage * pageSize;
-  // Use slice to create a view of the current page without mutating the sorted array
+  // Use slice to create a view of the current page without mutating the sorted array.
   const visibleRows = sortedData.slice(startIndex, startIndex + pageSize);
 
-  // Navigation handlers with bounds checking to prevent going out of range
+  // Navigation handlers add bounds checking to prevent going out of range.
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(0, prev - 1));
   };
@@ -101,7 +101,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
 
   return (
     <>
-      {/* `table-responsive` adds horizontal scroll on small screens so columns don't squish into unreadable layout. */}
+      {/* `table-responsive` adds horizontal scroll on small screens so columns do not collapse into an unreadable layout. */}
       <div className="table-responsive">
         <table className="table table-striped table-hover table-sm mb-0">
           {/* `table-light` makes the header more readable against striped rows. */}
@@ -185,7 +185,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
                   {renderSortIndicator("deathsPer1000")}
                 </span>
               </th>
-              {/* Optional daily aggregates, scoped to the selected date range. */}
+              {/* Optional daily aggregates scoped to the selected date range. */}
               <th
                 scope="col"
                 className={`${stickyThClass} text-end text-nowrap`}
@@ -252,7 +252,7 @@ const CovidTable: FC<CovidTableProps> = ({ data }) => {
         </table>
       </div>
 
-      {/* Pagination controls + page size selector (both affect visibleRows). */}
+      {/* Pagination controls plus page size selector (both affect visibleRows). */}
       <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
         <div className="d-flex align-items-center gap-2">
           <label htmlFor="covidTablePageSize" className="form-label small text-muted mb-0">

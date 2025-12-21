@@ -5,8 +5,8 @@ type FieldKey = "cases" | "deaths" | "casesPer1000" | "deathsPer1000";
 type FieldRangeFilterProps = {
   field: FieldKey;
   // `minValue`/`maxValue` intentionally stay `string`:
-  // users can type intermediate states like "-" / "." / "1e" and we must not block input.
-  // Parsing/validation for business filtering happens elsewhere; here we only show UI state.
+  // Users can type intermediate states like "-" / "." / "1e," and we must not block input.
+  // Parsing and validation for business filtering happen elsewhere; here we only show UI state.
   minValue: string;
   maxValue: string;
   onChangeField: (field: FieldKey) => void;
@@ -23,7 +23,7 @@ const FieldRangeFilter: FC<FieldRangeFilterProps> = ({
   onChangeMax,
 }) => {
   // Visual-only validation:
-  // we do NOT change filtering logic and do NOT block typing; we only add Bootstrap `is-invalid`.
+  // We do not change filtering logic and do not block typing; we only add Bootstrap `is-invalid`.
   const isValueValid = (value: string) => value === "" || !Number.isNaN(Number(value));
 
   const minIsValid = isValueValid(minValue);

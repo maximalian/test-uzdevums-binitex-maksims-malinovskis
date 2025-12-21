@@ -6,7 +6,7 @@ type ResetButtonProps = {
 };
 
 const ResetButton: FC<ResetButtonProps> = ({ onReset, disabled = false }) => {
-  // Button to reset filters back to their default values
+  // Button to reset filters back to their default values.
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     onReset();
@@ -18,7 +18,7 @@ const ResetButton: FC<ResetButtonProps> = ({ onReset, disabled = false }) => {
       onClick={handleClick}
       disabled={disabled}
       className="btn btn-outline-secondary"
-      // `btn-outline-secondary` is noticeable but not "danger" (reset is reversible and not destructive).
+      // `btn-outline-secondary` is noticeable but not "danger" because reset is reversible and not destructive.
     >
       Сбросить фильтры
     </button>

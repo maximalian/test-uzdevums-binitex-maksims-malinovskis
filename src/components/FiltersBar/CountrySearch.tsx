@@ -7,7 +7,7 @@ type CountrySearchProps = {
 };
 
 const CountrySearch: FC<CountrySearchProps> = ({ value, onChange }) => {
-  // Controlled input: value is driven by parent state, and we propagate changes upward
+  // Controlled input: value is driven by parent state, and we propagate changes upward.
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const nextValue = event.target.value;
@@ -25,7 +25,7 @@ const CountrySearch: FC<CountrySearchProps> = ({ value, onChange }) => {
         onChange={handleChange}
         placeholder="Введите страну..."
         className="form-control"
-        // Controlled input that will later feed into table/chart filtering
+        // Controlled input that will later feed into table and chart filtering.
       />
     </label>
   );

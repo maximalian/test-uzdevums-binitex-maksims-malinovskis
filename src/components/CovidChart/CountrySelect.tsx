@@ -3,7 +3,7 @@ import { useMemo } from "react";
 
 type CountrySelectProps = {
   countries: string[];
-  value: string; // empty string means "all countries"
+  value: string; // Empty string means "all countries."
   onChange: (value: string) => void;
 };
 
@@ -22,7 +22,7 @@ const CountrySelect: FC<CountrySelectProps> = ({ countries, value, onChange }) =
         value={value}
         onChange={handleChange}
         className="form-select"
-        // Dropdown: first option uses '' to represent "all countries" so aggregations can include everyone.
+        // Dropdown: the first option uses '' to represent "all countries" so aggregations can include everyone.
       >
         <option value="">Все страны</option>
         {sortedCountries.map((country) => (

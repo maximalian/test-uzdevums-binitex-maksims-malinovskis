@@ -9,10 +9,10 @@ export default function FiltersPanel({ title = "Filters", children }: FiltersPan
   return (
     <div className="card shadow-sm filters-panel">
       <div className="card-body">
-        {/* WHY: reusable wrapper to keep a single consistent Bootstrap look for all filter blocks. */}
+        {/* Reusable wrapper to keep a single consistent Bootstrap look for all filter blocks. */}
         <div className="mb-3">
           <h5 className="card-title mb-1">{title}</h5>
-          {/* OPTIONAL: small hint text under the title for better UX context. */}
+          {/* Optional hint text under the title for better UX context. */}
           <small className="text-muted">Adjust filters to narrow down results</small>
         </div>
 

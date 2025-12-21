@@ -28,7 +28,7 @@ const calcPerThousand = (value: number, population: number): number => {
 export function aggregateByCountry(records: CovidRecord[], filters: AggregationFilters): CountryRow[] {
   const aggregates = new Map<string, MutableCountryAggregate>();
 
-  // aggregation pass: totals + per-period sums
+  // Aggregation pass: totals plus per-period sums.
   for (const record of records) {
     const countryKey = record.countriesAndTerritories;
     const population = safePopulation(record.popData2019);
@@ -48,15 +48,15 @@ export function aggregateByCountry(records: CovidRecord[], filters: AggregationF
 
     const bucket = aggregates.get(countryKey)!;
 
-    // totals (all time)
+    // Totals (all time).
     bucket.casesTotalAllTime += record.cases;
     bucket.deathsTotalAllTime += record.deaths;
 
-    // period sums; group by day so we can derive per-day metrics (avg/max) later without touching UI.
+    // Period sums: group by day so we can derive per-day metrics (avg/max) later without touching UI.
     const recordDate = parseApiDate(record.dateRep);
     // Use dateRange to keep calculations constrained to the user-selected window.
     if (isDateInRange(recordDate, filters.dateRange.from, filters.dateRange.to)) {
-      const dayKey = recordDate.toISOString().slice(0, 10); // YYYY-MM-DD
+      const dayKey = recordDate.toISOString().slice(0, 10); // YYYY-MM-DD.
       bucket.casesInPeriod += record.cases;
       bucket.deathsInPeriod += record.deaths;
       bucket.dailyCases.set(dayKey, (bucket.dailyCases.get(dayKey) ?? 0) + record.cases);
@@ -64,7 +64,7 @@ export function aggregateByCountry(records: CovidRecord[], filters: AggregationF
     }
   }
 
-  // map to final rows with /1000 metrics
+  // Map to final rows with per-thousand metrics.
   let rows: CountryRow[] = Array.from(aggregates.values()).map((agg) => {
     const dayKeys = new Set([...agg.dailyCases.keys(), ...agg.dailyDeaths.keys()]);
     const sortedDays = Array.from(dayKeys).sort();
@@ -94,14 +94,14 @@ export function aggregateByCountry(records: CovidRecord[], filters: AggregationF
     };
   });
 
-  // filtering: country (case-insensitive substring)
+  // Filtering: country (case-insensitive substring).
   const countryQuery = filters.countryQuery.trim();
   if (countryQuery !== "") {
     const q = countryQuery.toLowerCase();
     rows = rows.filter((row) => row.country.toLowerCase().includes(q));
   }
 
-  // filtering: numeric field min/max (empty strings mean "no bound"; NaN is ignored)
+  // Filtering: numeric field min/max (empty strings mean "no bound"; NaN is ignored).
   const { field, min, max } = filters.numericFilter;
   const numericKey = {
     cases: "casesInPeriod",
@@ -124,7 +124,7 @@ export function aggregateByCountry(records: CovidRecord[], filters: AggregationF
     });
   }
 
-  // sorting: stable alphabetical ordering by country name
+  // Sorting: stable alphabetical ordering by country name.
   rows.sort((a, b) => a.country.localeCompare(b.country));
 
   return rows;

@@ -33,13 +33,13 @@ export type CountryFilter = {
   countryQuery: string;
 };
 
-// Aggregation-level filters used by aggregateByCountry + filtering UI.
+// Aggregation-level filters used by aggregateByCountry and the filtering UI.
 export type AggregationFilters = {
   dateRange: DateRangeFilter;
   countryQuery: string;
   numericFilter: {
     field: NumericFilterField;
     min: string; // Keep as string to allow validation and preserve raw user input.
-    max: string; // Empty string means "not set", so parsing happens later.
+    max: string; // Empty string means "not set," so parsing happens later.
   };
 };
