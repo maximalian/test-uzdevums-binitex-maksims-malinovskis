@@ -2,16 +2,19 @@
 
 React + TypeScript + Vite app that visualizes global COVID-19 case data from the European Centre for Disease Prevention and Control (ECDC). It fetches the dataset at runtime, lets you filter by period and metrics, and switches between a sortable table and a time-series chart.
 
-## Live Preview
-
-Live demo: none
-
-## Screenshots / GIF
+## Screenshots
 
 - Table view screenshot  
   ![Table view](./docs/table.png)
 - Chart view screenshot  
   ![Chart view](./docs/chart.png)
+
+## GIF
+
+- Table gif  
+  ![Table gif](./docs/table.gif)
+- Chart gif  
+  ![Chart gif](./docs/chart.gif)
 
 ## Data Source / Data Refresh
 
@@ -28,7 +31,7 @@ Live demo: none
 - Table: per-country aggregation with sorting, pagination, totals (period and all time), per-1k rates, and avg/max per day metrics.
 - Chart: responsive line chart (Recharts) for daily cases and deaths, with an optional country selector (all countries or a single country).
 
-## Metrics & Aggregations
+## Metrics / Aggregations
 
 - `casesPer1000` / `deathsPer1000`: total cases/deaths for the selected date range divided by population and multiplied by 1,000 (population sourced from the API payload).
 - Avg per day: sum of cases/deaths in the selected range divided by the number of days in range.
@@ -82,8 +85,6 @@ npm run dev
 npm run build
 npm run lint
 ```
-
-Testing: no automated tests yet.
 
 ## Limitations
 
