@@ -1,7 +1,7 @@
 // Fetches COVID-19 case distribution data from ECDC.
 export async function fetchCovidData() {
   // Endpoint providing COVID-19 case distribution in JSON format.
-  const url = 'https://opendata.ecdc.europa.eu/covid19/casedistribution/json/';
+  const url = '/api/ecdc/covid19/casedistribution/json/';
 
   try {
     // Perform the HTTP GET request.
