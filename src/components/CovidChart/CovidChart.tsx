@@ -44,8 +44,8 @@ const CovidChart: FC<CovidChartProps> = ({
               typeof value === "string"
                 ? value
                 : value instanceof Date
-                  ? value.toISOString().slice(0, 10)
-                  : String(value);
+                ? value.toISOString().slice(0, 10)
+                : String(value);
             return raw.slice(0, 7); // YYYY-MM.
           }}
           angle={-45}
