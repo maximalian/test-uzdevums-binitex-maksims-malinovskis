@@ -1,6 +1,6 @@
 # COVID-19 Statistics Dashboard
 
-**Language / Valoda / Язык:** 🇬🇧 [English](#english) | 🇷🇺 [Русский](#russian) | 🇱🇻 [Latviešu](#latviesu)
+**Language / Valoda / Язык:** [English](#english) | [Русский](#russian) | [Latviesu](#latviesu)
 
 ## English
 
@@ -40,7 +40,7 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 ### How to Use
 
 - Dates default to the API min/max; changing either instantly updates table and chart.
-- Table defaults: countries sorted A→Z; page size 20 rows (configurable in UI if exposed).
+- Table defaults: countries sorted A<>Z; page size 20 rows (configurable in UI if exposed).
 - Reset filters returns dates, country search, and numeric ranges to defaults.
 - View toggle switches Table <-> Chart; both honor the active date range.
 - Chart country selector: empty = aggregated across all countries; pick a country to view only its series.
@@ -72,12 +72,22 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 - Production: either call the upstream URL directly or serve behind a reverse proxy that rewrites `/api/ecdc/*` to the upstream to avoid CORS.
 - If you change the proxy path, keep `vite.config.ts` and `src/services/covidApi.ts` in sync.
 
+### Assignment Coverage
+
+| Requirement | Status | Notes |
+| --- | --- | --- |
+| Fetch data from ECDC API | Done | Live fetch from `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/` via dev proxy `/api/ecdc`. |
+| Table view with sorting, pagination, totals | Done | Per-country aggregation with sorting, pagination, period/all-time totals, per-1k, avg/max per day. |
+| Chart view | Done | Recharts line chart of daily cases and deaths; honors date range and optional country selector. |
+| Date range filter (API min/max defaults) | Done | Changing either date instantly updates table and chart. |
+| Country search and numeric range filters + reset | Done | Search by country and range filters for cases/deaths/per 1k; reset button clears all filters. |
+| View toggle (Table ↔ Chart) | Done | Tabs control which view is shown while keeping shared filters. |
+| Extras: avg/max per day, responsive layout | Done | Avg/max per day columns, Bootstrap-based responsive layout. |
+| Validation/UX touches | Partial | Date inputs bounded by API min/max; numeric fields expect numbers (no custom error UI). |
+
 ### Project Structure
 
 - `src/components` - UI pieces (filters, table, chart, view tabs, shared states)
-- `src/components/CovidTable` - table view and pagination
-- `src/components/CovidChart` - time-series chart and country selector
-- `src/components/FiltersBar` - date range, country search, numeric range filters, reset
 - `src/services` - API layer (ECDC fetch)
 - `src/utils` - aggregation, date, and series helpers
 - `src/types` - TypeScript models for API and derived data
@@ -86,10 +96,9 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 ### Key Files
 
 - `src/App.tsx` - top-level page: fetches data, manages filters, toggles views
-- `src/services/covidApi.ts` - fetches the ECDC dataset via the dev proxy
-- `src/utils/aggregate.ts` - builds per-country aggregates with filters
-- `src/utils/series.ts` - builds time-series data for the chart
-- `src/types` - shared shapes for API records and derived data
+- `src/components/CovidTable.tsx` - table view and pagination
+- `src/components/CovidChart.tsx` - time-series chart and country selector
+- `src/components/FiltersBar.tsx` - date range, country search, numeric range filters, reset
 - `vite.config.ts` - Vite config with the `/api/ecdc` dev proxy
 
 ### Limitations
@@ -112,94 +121,112 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 
 ### Обзор
 
-Приложение на React + TypeScript + Vite для визуализации COVID-19 статистики от Европейского центра профилактики и контроля заболеваний (ECDC). Загружает данные онлайн, позволяет фильтровать по периоду и метрикам, переключаться между сортируемой таблицей и графиком, сравнивать страны.
+Приложение на React + TypeScript + Vite для глобальной статистики COVID-19 от Европейского центра по профилактике и контролю заболеваний (ECDC). Фильтрация по периоду и метрикам, переключение между сортируемой таблицей и временным графиком, наглядное сравнение стран.
 
 ### Скриншоты
 
-- Таблица  
-  ![Table view](./docs/table.png)
-- График  
-  ![Chart view](./docs/chart.png)
+- Вид таблицы  
+  ![Вид таблицы](./docs/table.png)
+- Вид графика  
+  ![Вид графика](./docs/chart.png)
 
 ### GIF
 
-- Таблица  
-  ![Table gif](./docs/table.gif)
-- График  
-  ![Chart gif](./docs/chart.gif)
+- GIF таблицы  
+  ![GIF таблицы](./docs/table.gif)
+- GIF графика  
+  ![GIF графика](./docs/chart.gif)
 
 ### Возможности
 
-- Фильтр диапазона дат (границы берутся из min/max API) — влияет на таблицу и график.
-- Поиск по стране и числовые фильтры для `cases`, `deaths`, `casesPer1000`, `deathsPer1000`.
-- Переключатель вида: Таблица или График; кнопка сброса фильтров.
-- Таблица: агрегирование по странам, сортировка, пагинация, итоги (за период и за всё время), показатели на 1k, средние/максимумы в день.
-- График: адаптивный Recharts line chart по ежедневным случаям и смертям, с выбором страны (все или одна).
+- Фильтр диапазона дат (автоматически ограничен min/max из API) управляет агрегацией таблицы и сериями графика.
+- Поиск по стране плюс числовые фильтры для `cases`, `deaths`, `casesPer1000` и `deathsPer1000`.
+- Переключатель представления: Таблица или График; кнопка сброса очищает все фильтры одним кликом.
+- Таблица: агрегация по странам, сортировка, пагинация, итоги (за период и за всё время), показатели на 1 000, средние/максимальные значения в день.
+- График: адаптивный линейный график Recharts ежедневных случаев и смертей с опциональным выбором страны (все страны или одна).
 
-### Метрики и агрегирование
+### Метрики и агрегации
 
-- `casesPer1000` / `deathsPer1000`: сумма случаев/смертей за выбранный период / население \* 1 000 (население из API).
-- Среднее в день: сумма случаев/смертей за период / число дней в периоде.
-- Максимум в день: максимальное дневное значение в выбранном диапазоне.
-- Колонки «Всего»: итоги по всему набору данных, не зависят от выбранного периода.
+- `casesPer1000` / `deathsPer1000`: общее число случаев/смертей за выбранный период, делённое на численность населения и умноженное на 1 000 (население берётся из данных API).
+- Среднее в день: сумма случаев/смертей в выбранном диапазоне, делённая на количество дней в диапазоне.
+- Максимум в день: максимальное значение случаев/смертей за один день в пределах выбранного диапазона.
+- Колонки «За всё время»: итоги по всему набору данных, не зависят от выбранного диапазона дат.
 
 ### Как пользоваться
 
-- По умолчанию даты = min/max из API; изменение сразу обновляет таблицу и график.
-- Таблица по умолчанию: страны отсортированы A→Z; размер страницы 20 строк (если UI позволяет, можно менять).
-- Сброс фильтров возвращает даты, поиск и числовые диапазоны к дефолту.
-- Переключатель вида: Таблица <-> График; оба используют активный диапазон дат.
-- Выбор страны на графике: пусто = данные по всем странам; выбранная страна = только её серия.
+- Даты по умолчанию равны min/max из API; изменение любой из них мгновенно обновляет таблицу и график.
+- Настройки таблицы по умолчанию: страны отсортированы A–Z; размер страницы — 20 строк (можно сделать настраиваемым в UI).
+- Сброс фильтров возвращает даты, поиск по стране и числовые диапазоны к значениям по умолчанию.
+- Переключатель вида меняет Таблица <-> График; оба режима учитывают активный диапазон дат.
+- Выбор страны на графике: пусто = агрегировано по всем странам; выберите страну, чтобы видеть только её серию.
 
 ### Быстрый старт
 
-- Требования: Node.js 18+, современные Chrome/Firefox/Edge.
-- Установка: `npm install`
-- Dev-сервер: `npm run dev` (Vite по умолчанию http://localhost:5173)
-- Прод-сборка: `npm run build`
-- Предпросмотр прод-сборки локально: `npm run preview`
-- Линт: `npm run lint`
+- Требования: Node.js 18+, современный Chrome/Firefox/Edge.
+- Установка зависимостей: `npm install`
+- Dev-сервер: `npm run dev` (Vite по умолчанию на http://localhost:5173)
+- Продакшн-сборка: `npm run build`
+- Локальный предпросмотр продакшн-сборки: `npm run preview`
+- Линтинг: `npm run lint`
 
-### Стек
+### Технологический стек
 
 - React 19, TypeScript, Vite
 - Recharts для графиков
-- Bootstrap 5 для сетки и стилей
+- Bootstrap 5 для вёрстки и стилей
 
 ### Источник данных и обновление
 
-- API: `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/`
-- Данные грузятся на старте, кеша нет.
-- Если меняется схема/URL API, обновите `src/services/covidApi.ts`, типы в `src/types` и dev-прокси в `vite.config.ts`.
+- Endpoint: `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/`
+- Данные загружаются в реальном времени при запуске приложения; локальных снапшотов или кэша нет.
+- Если изменится форма данных или URL API, обновите `src/services/covidApi.ts`, типы в `src/types` и при необходимости прокси в `vite.config.ts`.
 
-### Прокси (dev)
+### API-прокси (Dev)
 
-- Dev-прокси: `/api/ecdc` -> `https://opendata.ecdc.europa.eu` (`vite.config.ts`), fetch путь `/api/ecdc/covid19/casedistribution/json/` (`src/services/covidApi.ts`).
-- Прод: либо обращаться напрямую к upstream, либо ставить reverse proxy, переписывающий `/api/ecdc/*`, иначе будет CORS.
-- Если меняете путь, синхронизируйте `vite.config.ts` и `src/services/covidApi.ts`.
+- Dev-прокси: `/api/ecdc` -> `https://opendata.ecdc.europa.eu` (см. `vite.config.ts`), соответствует пути запроса `/api/ecdc/covid19/casedistribution/json/` в `src/services/covidApi.ts`.
+- Продакшн: либо вызывать upstream-URL напрямую, либо использовать обратный прокси, который переписывает `/api/ecdc/*` в upstream, чтобы избежать CORS.
+- Если меняете путь прокси, держите `vite.config.ts` и `src/services/covidApi.ts` синхронизированными.
+
+### Покрытие задания
+
+| Требование | Статус | Примечания |
+| --- | --- | --- |
+| Загрузка данных из ECDC API | Сделано | Живой fetch `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/` через dev-прокси `/api/ecdc`. |
+| Табличный вид с сортировкой, пагинацией, итогами | Сделано | Агрегация по странам, сортировка, пагинация, итоги за период/все время, показатели на 1k, средние/максимумы в день. |
+| График | Сделано | Recharts line chart по дневным случаям/смертям; учитывает диапазон дат и выбор страны. |
+| Фильтр дат (min/max из API по умолчанию) | Сделано | Изменение даты сразу обновляет таблицу и график. |
+| Поиск по стране и числовые фильтры + сброс | Сделано | Поиск по стране и диапазоны для cases/deaths/per 1k; кнопка сброса очищает все фильтры. |
+| Переключение видов (Таблица ↔ График) | Сделано | Вкладки управляют отображением, фильтры общие. |
+| Дополнительно: средние/максимумы в день, адаптивность | Сделано | Колонки avg/max в день, вёрстка на Bootstrap. |
+| Валидация/UX | Частично | Даты ограничены min/max API; числовые поля ожидают числа (без отдельного UI ошибок). |
 
 ### Структура проекта
 
-- `src/components` — UI блоки (фильтры, таблица, график, переключатель видов, общее состояние)
-- `src/components/CovidTable` — таблица и пагинация
-- `src/components/CovidChart` — график и селектор страны
-- `src/components/FiltersBar` — даты, поиск по стране, числовые фильтры, сброс
-- `src/services` — слой API (fetch ECDC)
-- `src/utils` — агрегации, даты, подготовка серий
-- `src/types` — модели API и производных данных
+- `src/components` - UI-компоненты (фильтры, таблица, график, вкладки вида, общее состояние)
+- `src/services` - слой API (загрузка данных ECDC)
+- `src/utils` - хелперы агрегации, дат и серий
+- `src/types` — модели TypeScript для API и производных данных
 - `/public` — статические ресурсы
+
+### Ключевые файлы
+
+- `src/App.tsx` — верхнеуровневая страница: загрузка данных, управление фильтрами, переключение видов
+- `src/components/CovidTable.tsx` — табличный вид и пагинация
+- `src/components/CovidChart.tsx` — временной график и выбор страны
+- `src/components/FiltersBar.tsx` — диапазон дат, поиск по стране, числовые фильтры, сброс
+- `vite.config.ts` — конфигурация Vite с dev-прокси `/api/ecdc`
 
 ### Ограничения
 
-- Нет офлайн-режима; зависимость от доступности ECDC.
-- Нет сохранения данных между сессиями (только in-memory).
-- Стили на базе Bootstrap, не кастомный дизайн-систем.
+- Нет офлайн-режима; зависит от доступности ECDC.
+- Нет сохранения состояния между сессиями (только в памяти).
+- Стили основаны на Bootstrap, без собственной дизайн-системы.
 
-### Решение проблем
+### Устранение неполадок
 
-- CORS: в dev используйте прокси (`npm run dev`) или настройте свой прокси в проде.
-- Проблемы установки: удалите `node_modules`, `npm cache clean --force`, затем `npm install`.
-- Данные не грузятся: проверьте URL ECDC, актуализируйте fetch/proxy/типы при изменениях upstream.
+- CORS при прямом вызове API: используйте dev-прокси (`npm run dev`) или прокси в продакшне.
+- Проблемы с установкой: удалите `node_modules`, выполните `npm cache clean --force`, затем `npm install`.
+- Данные перестали загружаться: проверьте URL ECDC и обновите URL запроса/прокси/типы, если upstream-API изменился.
 
 ---
 
@@ -209,7 +236,7 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 
 ### Pārskats
 
-React + TypeScript + Vite lietotne COVID-19 datu vizualizācijai no Eiropas Slimību profilakses un kontroles centra (ECDC). Ielādē datus reāllaikā, ļauj filtrēt periodu un rādītājus, pārslēgties starp sakārtojamu tabulu un laika rindas grafiku.
+React + TypeScript + Vite informācijas panelis globālajai COVID-19 statistikai no Eiropas Slimību profilakses un kontroles centra (ECDC). Filtrēšana pēc perioda un metrikām, pārslēgšanās starp kārtojamu tabulu un laika rindas grafiku, kā arī valstu salīdzināšana vienā skatā.
 
 ### Ekrānuzņēmumi
 
@@ -225,69 +252,93 @@ React + TypeScript + Vite lietotne COVID-19 datu vizualizācijai no Eiropas Slim
 - Grafika GIF  
   ![Grafika GIF](./docs/chart.gif)
 
-### Funkcionalitāte
+### Iespējas
 
-- Datumu diapazona filtrs (automātiski robežots ar API min/max), kas ietekmē tabulas agregāciju un grafika sērijas.
-- Valstu meklēšana un skaitliskie filtri (`cases`, `deaths`, `casesPer1000`, `deathsPer1000`).
-- Skata pārslēgšana: Tabula vai Grafiks; poga, lai atiestatītu visus filtrus.
-- Tabula: agregācija pa valstīm, šķirošana, lapošana, kopsummas (perioda un visu laiku), rādītāji uz 1k, vidējais/maksimālais dienā.
-- Grafiks: Recharts līniju grafiks ar dienas gadījumiem/nāves gadījumiem, izvēles valsts selektors (visas valstis vai viena).
+- Datumu diapazona filtrs (automātiski ierobežots ar API min/max) ietekmē gan tabulas agregāciju, gan grafika sērijas.
+- Valstu meklēšana un skaitliskie filtri `cases`, `deaths`, `casesPer1000` un `deathsPer1000`.
+- Skata pārslēdzējs: Tabula vai Grafiks; atiestatīšanas poga notīra visus filtrus ar vienu klikšķi.
+- Tabula: agregācija pa valstīm, kārtošana, lapošana, kopsummas (par periodu un par visu laiku), rādītāji uz 1 000, vidējās/maksimālās dienas vērtības.
+- Grafiks: adaptīvs Recharts līniju grafiks ar dienas saslimšanas un nāves gadījumu datiem, ar izvēles valsts selektoru (visas valstis vai viena).
 
-### Metrikas un agregācija
+### Metrikas un agregācijas
 
-- `casesPer1000` / `deathsPer1000`: perioda gadījumi/nāves dalīti ar populāciju un reizināti ar 1 000 (populācija no API).
-- Vidēji dienā: perioda summa dalīta ar dienu skaitu.
-- Maksimums dienā: lielākā vienas dienas vērtība periodā.
-- Kolonnas "Kopējais": kopsummas pa visu datu kopu, neatkarīgas no izvēlētā datumu diapazona.
+- `casesPer1000` / `deathsPer1000`: kopējais saslimšanas/nāves gadījumu skaits izvēlētajā periodā, dalīts ar iedzīvotāju skaitu un reizināts ar 1 000 (iedzīvotāju skaits no API datiem).
+- Vidēji dienā: gadījumu/nāves gadījumu summa izvēlētajā diapazonā, dalīta ar dienu skaitu diapazonā.
+- Maksimums dienā: maksimālais vienas dienas gadījumu/nāves gadījumu skaits izvēlētajā diapazonā.
+- Kolonnas “Par visu laiku”: kopsummas visam datu kopumam, neatkarīgi no izvēlētā datumu diapazona.
 
 ### Kā lietot
 
-- Noklusējuma datumi ir API min/max; maiņa uzreiz atjaunina tabulu un grafiku.
-- Tabulas noklusējumi: valstis kārtotas A→Z; lapas izmērs 20 rindas (ja UI ļauj, var mainīt).
-- "Reset" poga atgriež datumus, valsts meklēšanu un skaitliskos filtrus noklusējumā.
-- Skata pārslēgs: Tabula <-> Grafiks; abi izmanto aktīvo datumu diapazonu.
-- Valsts izvēle grafikā: tukšs = agregēti visi dati; izvēlēta valsts = tikai tās sērija.
+- Datumi pēc noklusējuma ir API min/max; jebkuras izmaiņas nekavējoties atjauno tabulu un grafiku.
+- Tabulas noklusējuma iestatījumi: valstis sakārtotas A–Z; lapas izmērs — 20 rindas (ja UI to atļauj, var konfigurēt).
+- Filtru atiestatīšana atgriež datumus, valstu meklēšanu un skaitliskos diapazonus uz noklusējuma vērtībām.
+- Skata pārslēgšana maina Tabula <-> Grafiks; abi skati ievēro aktīvo datumu diapazonu.
+- Grafika valsts selektors: tukšs = agregēts pa visām valstīm; izvēloties valsti, tiek rādīta tikai tās sērija.
 
 ### Ātrais starts
 
-- Prasības: Node.js 18+, mūsdienu Chrome/Firefox/Edge.
-- Instalēt atkarības: `npm install`
+- Prasības: Node.js 18+, mūsdienīgs Chrome/Firefox/Edge.
+- Atkarību instalēšana: `npm install`
 - Dev serveris: `npm run dev` (Vite pēc noklusējuma http://localhost:5173)
 - Produkcijas būve: `npm run build`
-- Produkcijas priekšskatījums lokāli: `npm run preview`
-- Linters: `npm run lint`
+- Produkcijas būves lokāls priekšskatījums: `npm run preview`
+- Lintēšana: `npm run lint`
 
-### Datu avots un atjaunošana
+### Tehnoloģiju steks
 
-- ECDC API: `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/`
-- Dati tiek ielādēti palaišanas brīdī; nav lokālu kešu vai momentuzņēmumu.
-- Ja mainās API shēma/URL, jāatjaunina `src/services/covidApi.ts`, tipizācija `src/types` un dev starpnieks `vite.config.ts`.
+- React 19, TypeScript, Vite
+- Recharts grafikiem
+- Bootstrap 5 izkārtojumam un stiliem
 
-### Starpnieks (dev)
+### Datu avots un atjaunināšana
 
-- Dev starpnieks: `/api/ecdc` -> `https://opendata.ecdc.europa.eu` (`vite.config.ts`), fetch ceļš `/api/ecdc/covid19/casedistribution/json/` (`src/services/covidApi.ts`).
-- Produkcija: zvaniet tieši uz augšupstraumi vai izmantojiet reverse proxy, kas pārraksta `/api/ecdc/*`, lai izvairītos no CORS.
-- Ja maināt ceļu, saskaņojiet `vite.config.ts` un `src/services/covidApi.ts`.
+- Endpoint: `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/`
+- Dati tiek ielādēti tiešsaistē lietotnes startā; nav lokālu momentuzņēmumu vai kešošanas.
+- Ja mainās API struktūra vai URL, atjaunojiet `src/services/covidApi.ts`, tipus mapē `src/types` un, ja nepieciešams, proksi `vite.config.ts`.
+
+### API proksi (Dev)
+
+- Dev proksi: `/api/ecdc` -> `https://opendata.ecdc.europa.eu` (skat. `vite.config.ts`), atbilst pieprasījuma ceļam `/api/ecdc/covid19/casedistribution/json/` failā `src/services/covidApi.ts`.
+- Produkcija: vai nu izsaukt upstream URL tieši, vai izmantot reverso proksi, kas pārraksta `/api/ecdc/*` uz upstream, lai izvairītos no CORS.
+- Ja maināt proksi ceļu, saskaņojiet `vite.config.ts` un `src/services/covidApi.ts`.
+
+### Uzdevuma izpilde
+
+| Prasiba | Statuss | Piezimes |
+| --- | --- | --- |
+| Datu ielade no ECDC API | Izpildīts | Dzivs fetch `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/` caur dev proksi `/api/ecdc`. |
+| Tabulas skats ar kartsosanu, lapošanu, kopsummām | Izpildīts | Aprekini pa valstim, kartsosana, laposana, kopsummas periodam un visam laikam, rādītāji uz 1k, vid./max dienā. |
+| Grafiks | Izpildīts | Recharts līniju grafiks pa dienām; ievēro datumu diapazonu un valsts izvēli. |
+| Datumu filtrs (API min/max pēc noklusējuma) | Izpildīts | Datumu maiņa uzreiz atjauno tabulu un grafiku. |
+| Valstu meklēšana un skaitliskie filtri + atiestatīšana | Izpildīts | Meklēšana pa valstīm un diapazoni cases/deaths/per 1k; reset poga attīra visus filtrus. |
+| Skata pārslēgšana (Tabula ↔ Grafiks) | Izpildīts | Cilnes pārslēdz skatu, filtri ir kopīgi. |
+| Papildu: vid./maks. dienā, responsīva vides | Izpildīts | Kolonnas vid./max dienā, Bootstrap responsīvs izkārtojums. |
+| Validācija/UX | Daļēji | Datumi ierobežoti ar min/max no API; skaitliskie lauki sagaida skaitļus (bez atsevišķa kļūdu UI). |
 
 ### Projekta struktūra
 
-- `src/components` - UI bloki (filtri, tabula, grafiks, skata pārslēgs, koplietojamie stāvokļi)
-- `src/components/CovidTable` - tabulas skats un lapošana
-- `src/components/CovidChart` - laika rindas grafiks un valsts selektors
-- `src/components/FiltersBar` - datumu diapazons, valsts meklēšana, skaitliskie filtri, reset
-- `src/services` - API kārta (ECDC fetch)
-- `src/utils` - agregācija, datumi, sēriju palīgfunkcijas
-- `src/types` - TypeScript modeļi API un atvasinātajiem datiem
-- `/public` - statiskie resursi
+- `src/components` — UI komponentes (filtri, tabula, grafiks, skata cilnes, kopīgais stāvoklis)
+- `src/services` — API slānis (ECDC datu ielāde)
+- `src/utils` — agregācijas, datumu un sēriju palīgfunkcijas
+- `src/types` — TypeScript modeļi API un atvasinātajiem datiem
+- `/public` — statiskie resursi
+
+### Galvenie faili
+
+- `src/App.tsx` — augšējā līmeņa lapa: datu ielāde, filtru pārvaldība, skatu pārslēgšana
+- `src/components/CovidTable.tsx` — tabulas skats un lapošana
+- `src/components/CovidChart.tsx` — laika rindas grafiks un valsts izvēle
+- `src/components/FiltersBar.tsx` — datumu diapazons, valstu meklēšana, skaitliskie filtri, atiestatīšana
+- `vite.config.ts` — Vite konfigurācija ar `/api/ecdc` dev proksi
 
 ### Ierobežojumi
 
-- Nav offline režīma; atkarīgs no ECDC pieejamības.
-- Nav datu persistences ārpus sesijas.
-- Dizains balstās uz Bootstrap; nav unikālas dizaina sistēmas.
+- Nav bezsaistes režīma; atkarīgs no ECDC pieejamības.
+- Nav stāvokļa saglabāšanas starp sesijām (tikai atmiņā).
+- Stili balstīti uz Bootstrap, nevis pielāgotu dizaina sistēmu.
 
 ### Problēmu novēršana
 
-- CORS: devā lietojiet proxy (`npm run dev`) vai producijā savu reverse proxy.
-- Instalācijas problēmas: izdzēsiet `node_modules`, `npm cache clean --force`, pēc tam `npm install`.
-- Ja dati vairs neielādējas: pārbaudiet ECDC URL un saskaņojiet fetch/proxy/tipizāciju, ja upstream ir mainījies.
+- CORS, izsaucot API tieši: izmantojiet dev proksi (`npm run dev`) vai proksi produkcijā.
+- Instalācijas problēmas: izdzēsiet `node_modules`, izpildiet `npm cache clean --force`, pēc tam `npm install`.
+- Dati vairs netiek ielādēti: pārbaudiet ECDC URL un atjaunojiet pieprasījuma URL/proksi/tipus, ja upstream API ir mainījies.
