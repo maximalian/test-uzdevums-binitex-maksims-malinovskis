@@ -56,9 +56,9 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 
 ### Tech Stack
 
-- React 19, TypeScript, Vite
-- Recharts for charts
-- Bootstrap 5 for layout/styling
+- React 19.2.3, TypeScript 5.9.3 , Vite 7.3.0
+- Recharts for charts 3.6.0
+- Bootstrap 5.3.8 for layout/styling
 
 ### Data Source and Refresh
 
@@ -74,16 +74,16 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 
 ### Assignment Coverage
 
-| Requirement | Status | Notes |
-| --- | --- | --- |
-| Fetch data from ECDC API | Done | Live fetch from `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/` via dev proxy `/api/ecdc`. |
-| Table view with sorting, pagination, totals | Done | Per-country aggregation with sorting, pagination, period/all-time totals, per-1k, avg/max per day. |
-| Chart view | Done | Recharts line chart of daily cases and deaths; honors date range and optional country selector. |
-| Date range filter (API min/max defaults) | Done | Changing either date instantly updates table and chart. |
-| Country search and numeric range filters + reset | Done | Search by country and range filters for cases/deaths/per 1k; reset button clears all filters. |
-| View toggle (Table ↔ Chart) | Done | Tabs control which view is shown while keeping shared filters. |
-| Extras: avg/max per day, responsive layout | Done | Avg/max per day columns, Bootstrap-based responsive layout. |
-| Validation/UX touches | Partial | Date inputs bounded by API min/max; numeric fields expect numbers (no custom error UI). |
+| Requirement                                                                  | Status | Notes                                                                                                     |
+| ---------------------------------------------------------------------------- | ------ | --------------------------------------------------------------------------------------------------------- |
+| Fetch data from ECDC API                                                     | Done   | Live fetch via `/api/ecdc` dev proxy to `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/`. |
+| Date range filter with API min/max defaults + "Show full range" shortcut     | Done   | Date inputs are bounded; shortcut button appears when the range differs from defaults.                    |
+| Country search + numeric range filters + validation + reset                  | Done   | Search by country, numeric min/max per field with invalid-state styling, reset clears everything.         |
+| View toggle (Table <-> Chart)                                                | Done   | Tabs switch the view while retaining shared filters.                                                      |
+| Table view: aggregation, sorting, pagination, adjustable page size           | Done   | Per-country aggregation, sortable columns, pagination with 10/20/50 rows per page.                        |
+| Table metrics: period totals, all-time totals, per-1k rates, avg/max per day | Done   | All required columns plus derived metrics scoped to the selected period.                                  |
+| Chart view: daily cases/deaths lines + country selector                      | Done   | Recharts time series honors date range; dropdown filters to a specific country or all.                    |
+| Responsive layout and UX touches                                             | Done   | Bootstrap grid, table responsiveness, validation hints; no offline caching/persistence.                   |
 
 ### Project Structure
 
@@ -171,9 +171,9 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 
 ### Технологический стек
 
-- React 19, TypeScript, Vite
-- Recharts для графиков
-- Bootstrap 5 для вёрстки и стилей
+- React 19.2.3 , TypeScript 5.9.3, Vite 7.3.0
+- Recharts 3.6.0 для графиков
+- Bootstrap 5.3.8 для вёрстки и стилей
 
 ### Источник данных и обновление
 
@@ -189,16 +189,16 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 
 ### Покрытие задания
 
-| Требование | Статус | Примечания |
-| --- | --- | --- |
-| Загрузка данных из ECDC API | Сделано | Живой fetch `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/` через dev-прокси `/api/ecdc`. |
-| Табличный вид с сортировкой, пагинацией, итогами | Сделано | Агрегация по странам, сортировка, пагинация, итоги за период/все время, показатели на 1k, средние/максимумы в день. |
-| График | Сделано | Recharts line chart по дневным случаям/смертям; учитывает диапазон дат и выбор страны. |
-| Фильтр дат (min/max из API по умолчанию) | Сделано | Изменение даты сразу обновляет таблицу и график. |
-| Поиск по стране и числовые фильтры + сброс | Сделано | Поиск по стране и диапазоны для cases/deaths/per 1k; кнопка сброса очищает все фильтры. |
-| Переключение видов (Таблица ↔ График) | Сделано | Вкладки управляют отображением, фильтры общие. |
-| Дополнительно: средние/максимумы в день, адаптивность | Сделано | Колонки avg/max в день, вёрстка на Bootstrap. |
-| Валидация/UX | Частично | Даты ограничены min/max API; числовые поля ожидают числа (без отдельного UI ошибок). |
+| Требование                                            | Статус   | Примечания                                                                                                          |
+| ----------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
+| Загрузка данных из ECDC API                           | Сделано  | Живой fetch `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/` через dev-прокси `/api/ecdc`.          |
+| Табличный вид с сортировкой, пагинацией, итогами      | Сделано  | Агрегация по странам, сортировка, пагинация, итоги за период/все время, показатели на 1k, средние/максимумы в день. |
+| График                                                | Сделано  | Recharts line chart по дневным случаям/смертям; учитывает диапазон дат и выбор страны.                              |
+| Фильтр дат (min/max из API по умолчанию)              | Сделано  | Изменение даты сразу обновляет таблицу и график.                                                                    |
+| Поиск по стране и числовые фильтры + сброс            | Сделано  | Поиск по стране и диапазоны для cases/deaths/per 1k; кнопка сброса очищает все фильтры.                             |
+| Переключение видов (Таблица ↔ График)                 | Сделано  | Вкладки управляют отображением, фильтры общие.                                                                      |
+| Дополнительно: средние/максимумы в день, адаптивность | Сделано  | Колонки avg/max в день, вёрстка на Bootstrap.                                                                       |
+| Валидация/UX                                          | Частично | Даты ограничены min/max API; числовые поля ожидают числа (без отдельного UI ошибок).                                |
 
 ### Структура проекта
 
@@ -286,9 +286,9 @@ React + TypeScript + Vite informācijas panelis globālajai COVID-19 statistikai
 
 ### Tehnoloģiju steks
 
-- React 19, TypeScript, Vite
-- Recharts grafikiem
-- Bootstrap 5 izkārtojumam un stiliem
+- React 19.2.3, TypeScript 5.9.3, Vite 7.3.0
+- Recharts 3.6.0 grafikiem
+- Bootstrap 5.3.8 izkārtojumam un stiliem
 
 ### Datu avots un atjaunināšana
 
@@ -304,16 +304,16 @@ React + TypeScript + Vite informācijas panelis globālajai COVID-19 statistikai
 
 ### Uzdevuma izpilde
 
-| Prasiba | Statuss | Piezimes |
-| --- | --- | --- |
-| Datu ielade no ECDC API | Izpildīts | Dzivs fetch `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/` caur dev proksi `/api/ecdc`. |
-| Tabulas skats ar kartsosanu, lapošanu, kopsummām | Izpildīts | Aprekini pa valstim, kartsosana, laposana, kopsummas periodam un visam laikam, rādītāji uz 1k, vid./max dienā. |
-| Grafiks | Izpildīts | Recharts līniju grafiks pa dienām; ievēro datumu diapazonu un valsts izvēli. |
-| Datumu filtrs (API min/max pēc noklusējuma) | Izpildīts | Datumu maiņa uzreiz atjauno tabulu un grafiku. |
-| Valstu meklēšana un skaitliskie filtri + atiestatīšana | Izpildīts | Meklēšana pa valstīm un diapazoni cases/deaths/per 1k; reset poga attīra visus filtrus. |
-| Skata pārslēgšana (Tabula ↔ Grafiks) | Izpildīts | Cilnes pārslēdz skatu, filtri ir kopīgi. |
-| Papildu: vid./maks. dienā, responsīva vides | Izpildīts | Kolonnas vid./max dienā, Bootstrap responsīvs izkārtojums. |
-| Validācija/UX | Daļēji | Datumi ierobežoti ar min/max no API; skaitliskie lauki sagaida skaitļus (bez atsevišķa kļūdu UI). |
+| Prasiba                                                | Statuss   | Piezimes                                                                                                       |
+| ------------------------------------------------------ | --------- | -------------------------------------------------------------------------------------------------------------- |
+| Datu ielade no ECDC API                                | Izpildīts | Dzivs fetch `https://opendata.ecdc.europa.eu/covid19/casedistribution/json/` caur dev proksi `/api/ecdc`.      |
+| Tabulas skats ar kartsosanu, lapošanu, kopsummām       | Izpildīts | Aprekini pa valstim, kartsosana, laposana, kopsummas periodam un visam laikam, rādītāji uz 1k, vid./max dienā. |
+| Grafiks                                                | Izpildīts | Recharts līniju grafiks pa dienām; ievēro datumu diapazonu un valsts izvēli.                                   |
+| Datumu filtrs (API min/max pēc noklusējuma)            | Izpildīts | Datumu maiņa uzreiz atjauno tabulu un grafiku.                                                                 |
+| Valstu meklēšana un skaitliskie filtri + atiestatīšana | Izpildīts | Meklēšana pa valstīm un diapazoni cases/deaths/per 1k; reset poga attīra visus filtrus.                        |
+| Skata pārslēgšana (Tabula ↔ Grafiks)                   | Izpildīts | Cilnes pārslēdz skatu, filtri ir kopīgi.                                                                       |
+| Papildu: vid./maks. dienā, responsīva vides            | Izpildīts | Kolonnas vid./max dienā, Bootstrap responsīvs izkārtojums.                                                     |
+| Validācija/UX                                          | Daļēji    | Datumi ierobežoti ar min/max no API; skaitliskie lauki sagaida skaitļus (bez atsevišķa kļūdu UI).              |
 
 ### Projekta struktūra
 
