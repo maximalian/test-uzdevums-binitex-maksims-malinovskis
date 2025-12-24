@@ -1,6 +1,7 @@
 // Fetches COVID-19 case distribution data from ECDC.
 export async function fetchCovidData() {
   // Endpoint providing COVID-19 case distribution in JSON format.
+  // Same path for dev (Vite proxy) and prod (Node proxy) so the browser stays same-origin and avoids CORS.
   const url = '/api/ecdc/covid19/casedistribution/json/';
 
   try {

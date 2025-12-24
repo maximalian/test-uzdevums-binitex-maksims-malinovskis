@@ -66,11 +66,17 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 - Data is fetched live on app start; no local snapshots or caching.
 - If the API shape or URL changes, update `src/services/covidApi.ts`, adjust types in `src/types`, and align the proxy in `vite.config.ts` if needed.
 
-### API Proxy (Dev)
+### API Proxy (Dev & Prod)
 
-- Dev proxy: `/api/ecdc` -> `https://opendata.ecdc.europa.eu` (see `vite.config.ts`), matching fetch path `/api/ecdc/covid19/casedistribution/json/` in `src/services/covidApi.ts`.
-- Production: either call the upstream URL directly or serve behind a reverse proxy that rewrites `/api/ecdc/*` to the upstream to avoid CORS.
-- If you change the proxy path, keep `vite.config.ts` and `src/services/covidApi.ts` in sync.
+- Dev: Vite proxy `/api/ecdc` -> `https://opendata.ecdc.europa.eu` (see `vite.config.ts`), matching fetch path `/api/ecdc/covid19/casedistribution/json/` in `src/services/covidApi.ts`.
+- Prod: `npm run build` then `npm start` to run the Express proxy (`server.js`) which serves `dist/` and forwards `/api/ecdc/*` to the upstream with `Access-Control-Allow-Origin: *` so the browser does not hit CORS.
+- If you change the proxy path, keep `vite.config.ts`, `src/services/covidApi.ts`, and `server.js` in sync.
+
+### Why the proxy
+
+- CORS blocks browser JS from calling another host/port/protocol unless that server sets `Access-Control-Allow-Origin` headers. The ECDC API does not, so direct calls from the static build fail.
+- The Node proxy is same-origin to the frontend, forwards to ECDC, and adds permissive CORS headers before sending the JSON back.
+- Static file servers (e.g., `npx serve dist`) do not run the proxy; use `npm start` instead so `/api/ecdc/*` is handled server-side.
 
 ### Assignment Coverage
 
@@ -181,11 +187,17 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 - Данные загружаются в реальном времени при запуске приложения; локальных снапшотов или кэша нет.
 - Если изменится форма данных или URL API, обновите `src/services/covidApi.ts`, типы в `src/types` и при необходимости прокси в `vite.config.ts`.
 
-### API-прокси (Dev)
+### API-прокси (Dev и Prod)
 
-- Dev-прокси: `/api/ecdc` -> `https://opendata.ecdc.europa.eu` (см. `vite.config.ts`), соответствует пути запроса `/api/ecdc/covid19/casedistribution/json/` в `src/services/covidApi.ts`.
-- Продакшн: либо вызывать upstream-URL напрямую, либо использовать обратный прокси, который переписывает `/api/ecdc/*` в upstream, чтобы избежать CORS.
-- Если меняете путь прокси, держите `vite.config.ts` и `src/services/covidApi.ts` синхронизированными.
+- Dev: Vite-прокси `/api/ecdc` -> `https://opendata.ecdc.europa.eu` (см. `vite.config.ts`), совпадает с путём `/api/ecdc/covid19/casedistribution/json/` в `src/services/covidApi.ts`.
+- Prod: `npm run build`, затем `npm start`, чтобы запустить Express-прокси (`server.js`), который отдаёт `dist/` и проксирует `/api/ecdc/*` в upstream с `Access-Control-Allow-Origin: *`, избегая CORS в браузере.
+- Если меняете путь прокси, синхронизируйте `vite.config.ts`, `src/services/covidApi.ts` и `server.js`.
+- Статические сервера (например, `npx serve dist`) не запускают прокси; используйте `npm start`, чтобы `/api/ecdc/*` обрабатывался на сервере.
+
+### Зачем нужен прокси
+
+- CORS блокирует браузерные запросы к другому хосту/порту/протоколу без заголовка `Access-Control-Allow-Origin`. ECDC не выставляет эти заголовки, поэтому прямой вызов из статики падает.
+- Node-прокси работает с тем же origin, ходит к ECDC и добавляет разрешающие CORS-заголовки перед отдачей JSON.
 
 ### Покрытие задания
 
@@ -296,11 +308,17 @@ React + TypeScript + Vite informācijas panelis globālajai COVID-19 statistikai
 - Dati tiek ielādēti tiešsaistē lietotnes startā; nav lokālu momentuzņēmumu vai kešošanas.
 - Ja mainās API struktūra vai URL, atjaunojiet `src/services/covidApi.ts`, tipus mapē `src/types` un, ja nepieciešams, proksi `vite.config.ts`.
 
-### API proksi (Dev)
+### API proksi (Dev un Prod)
 
-- Dev proksi: `/api/ecdc` -> `https://opendata.ecdc.europa.eu` (skat. `vite.config.ts`), atbilst pieprasījuma ceļam `/api/ecdc/covid19/casedistribution/json/` failā `src/services/covidApi.ts`.
-- Produkcija: vai nu izsaukt upstream URL tieši, vai izmantot reverso proksi, kas pārraksta `/api/ecdc/*` uz upstream, lai izvairītos no CORS.
-- Ja maināt proksi ceļu, saskaņojiet `vite.config.ts` un `src/services/covidApi.ts`.
+- Dev: Vite proksi `/api/ecdc` -> `https://opendata.ecdc.europa.eu` (skat. `vite.config.ts`), sakrīt ar ceļu `/api/ecdc/covid19/casedistribution/json/` failā `src/services/covidApi.ts`.
+- Prod: `npm run build`, pēc tam `npm start`, lai palaistu Express proksi (`server.js`), kas apkalpo `dist/` un proxē `/api/ecdc/*` uz upstream ar `Access-Control-Allow-Origin: *`, tā izvairoties no CORS pārlūkā.
+- Ja maināt proksi ceļu, saskaņojiet `vite.config.ts`, `src/services/covidApi.ts` un `server.js`.
+- Statiskie serveri (piem., `npx serve dist`) nepalaiž proksi; izmantojiet `npm start`, lai `/api/ecdc/*` tiktu apstrādāts servera pusē.
+
+### Kāpēc vajag proksi
+
+- CORS bloķē pārlūka JS pieprasījumus uz citu hostu/portu/protokolu, ja nav `Access-Control-Allow-Origin`. ECDC to nesūta, tāpēc tiešais izsaukums no statikas krīt.
+- Node proksi ir tas pats origin, tas zvana uz ECDC un pievieno atļaujošus CORS headerus pirms atdošanas JSON.
 
 ### Uzdevuma izpilde
 
