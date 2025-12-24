@@ -8,6 +8,10 @@
 
 React + TypeScript + Vite dashboard for global COVID-19 stats from the European Centre for Disease Prevention and Control (ECDC). Filter by period and metrics, switch between a sortable table and a time-series chart, and compare countries at a glance.
 
+### Demo
+
+- https://test-uzdevums-binitex-maksims-malinovskis.onrender.com (first load can take ~50s due to cold start on the free tier)
+
 ### Screenshots
 
 - Table view  
@@ -129,6 +133,10 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 
 Приложение на React + TypeScript + Vite для глобальной статистики COVID-19 от Европейского центра по профилактике и контролю заболеваний (ECDC). Фильтрация по периоду и метрикам, переключение между сортируемой таблицей и временным графиком, наглядное сравнение стран.
 
+### Демо
+
+- https://test-uzdevums-binitex-maksims-malinovskis.onrender.com (первый запуск может занять ~50 секунд из-за cold start на бесплатном тарифе)
+
 ### Скриншоты
 
 - Вид таблицы  
@@ -249,6 +257,10 @@ React + TypeScript + Vite dashboard for global COVID-19 stats from the European 
 ### Pārskats
 
 React + TypeScript + Vite informācijas panelis globālajai COVID-19 statistikai no Eiropas Slimību profilakses un kontroles centra (ECDC). Filtrēšana pēc perioda un metrikām, pārslēgšanās starp kārtojamu tabulu un laika rindas grafiku, kā arī valstu salīdzināšana vienā skatā.
+
+### Demo
+
+- https://test-uzdevums-binitex-maksims-malinovskis.onrender.com (pirma ielāde var aizņemt ~50s bezmaksas tarifu cold start dēļ)
 
 ### Ekrānuzņēmumi
 
